@@ -145,7 +145,7 @@ const NavBar = () => {
             <Tooltip title="User">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar
-                  src={`http://engizone-api.herokuapp.com${user.avatar}`}
+                  src={`https://engizone-api.herokuapp.com${user.avatar}`}
                   alt={user.first_name.toUpperCase()}
                   sx={{ bgcolor: "crimson" }}
                   aria-label=""

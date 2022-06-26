@@ -138,7 +138,7 @@ const EditProfile = () => {
                 />
                 {!avatarPreview ? (
                   <Avatar
-                    src={`http://engizone-api.herokuapp.com${user.avatar}`}
+                    src={`https://engizone-api.herokuapp.com${user.avatar}`}
                     sx={{ width: 200, height: 200 }}
                   />
                 ) : (
