@@ -114,7 +114,7 @@ const Profile = () => {
           avatar={
             user ? (
               <Avatar
-                src={`http://localhost:8000${user.avatar}`}
+                src={`http://engizone-api.herokuapp.com${user.avatar}`}
                 alt={user.first_name.toUpperCase()}
                 sx={{ bgcolor: "crimson" }}
                 aria-label=""
