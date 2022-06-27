@@ -247,15 +247,13 @@ const Solution = ({ sol, handleDelete, loading }) => {
             action={
               loading ? null : (
                 <>
-                  {user.id === solution.owner.id && (
+                  {user?.id === solution.owner.id && (
                     <IconButton onClick={handleClickOpenEditSolutionDialog}>
                       <EditIcon />
                     </IconButton>
                   )}
-                  {user.id === solution.owner.id && (
-                    <IconButton
-                      onClick={handleClickOpen}
-                    >
+                  {user?.id === solution.owner.id && (
+                    <IconButton onClick={handleClickOpen}>
                       <DeleteForever />
                     </IconButton>
                   )}
@@ -288,7 +286,7 @@ const Solution = ({ sol, handleDelete, loading }) => {
             }
           />
           <Divider />
-        
+
           <CardContent sx={{ pt: 1, pb: 1 }}>
             {loading ? (
               <Typography variant="body1" color="text.primary">
