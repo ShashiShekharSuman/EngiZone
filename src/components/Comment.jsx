@@ -149,7 +149,7 @@ const Comment = ({ parent, comment, loading, handleDelete }) => {
                   <Grid item>
                     {loading ? null : (
                       <>
-                        {user.id === comment.owner.id && (
+                        {user?.id === comment.owner.id && (
                           <IconButton
                             sx={{ padding: 0, mr: 1 }}
                             onClick={() => handleDelete(comment.id)}
