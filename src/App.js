@@ -2,17 +2,15 @@ import React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Box, Container } from "@mui/material";
-import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import CssBaseline from "@mui/material/CssBaseline";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Fab from "@mui/material/Fab";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Zoom from "@mui/material/Zoom";
-import LinearProgress from "@mui/material/LinearProgress";
-import AuthContext from "./contexts/AuthContext";
+// import LinearProgress from "@mui/material/LinearProgress";
+// import AuthContext from "./contexts/AuthContext";
 import { NavBar, Footer } from "./components";
+
 import {
   Home,
   Questions,
@@ -28,7 +26,6 @@ import {
 } from "./pages";
 
 import "./App.css";
-
 
 const themeOptions = createTheme({
   palette: {
@@ -85,18 +82,16 @@ const ScrollTop = (props) => {
   );
 };
 
-const LinearIndeterminate = () => {
-  return (
-    <Box sx={{ width: "100%" }}>
-      <LinearProgress color="secondary" />
-    </Box>
-  );
-};
+// const LinearIndeterminate = () => {
+//   return (
+//     <Box sx={{ width: "100%" }}>
+//       <LinearProgress color="secondary" />
+//     </Box>
+//   );
+// };
 
 const App = () => {
-  const loading = React.useContext(AuthContext).loading;
-  const { user } = React.useContext(AuthContext);
-  React.useEffect(() => {}, [user]);
+  // const { loading } = React.useContext(AuthContext);
 
   return (
     <ThemeProvider theme={themeOptions}>
@@ -109,7 +104,7 @@ const App = () => {
           }}
         >
           <NavBar />
-          {loading && <LinearIndeterminate />}
+          {/* {loading && <LinearIndeterminate />} */}
           <Toolbar
             id="back-to-top-anchor"
             sx={{ minHeight: "0px !important" }}

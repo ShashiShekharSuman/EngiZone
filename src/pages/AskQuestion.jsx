@@ -7,7 +7,7 @@ import {
   Avatar,
   Chip,
   Autocomplete,
-  Checkbox,
+  Card,
 } from "@mui/material";
 import React from "react";
 import TextEditor from "../components/TextEditor";
@@ -15,12 +15,6 @@ import HelpIcon from "@mui/icons-material/Help";
 
 import { useNavigate } from "react-router-dom";
 import API from "../axios";
-
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
-
-const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const AskQuestion = () => {
   const [title, setTitle] = React.useState("");
@@ -112,7 +106,9 @@ const AskQuestion = () => {
             multiple
             options={options}
             getOptionLabel={(option) => option.tag_name}
-            limitTags={2}
+            limitTags={5}
+            filterSelectedOptions
+            loading
             onChange={(event, value) => {
               setTags(value);
             }}
@@ -137,17 +133,38 @@ const AskQuestion = () => {
                 placeholder="Add Tags"
               />
             )}
-            // renderOption={(props, option, { selected }) => (
-            //   <li {...props}>
-            //     <Checkbox
-            //       icon={icon}
-            //       checkedIcon={checkedIcon}
-            //       style={{ marginRight: 8 }}
-            //       checked={selected}
-            //     />
-            //     {option.title}
-            //   </li>
-            // )}
+            ListboxComponent={Grid}
+            ListboxProps={{
+              container: true,
+              spacing: 1,
+              justifyContent: "center",
+              sx: { pr: 1, overflow: "auto" },
+            }}
+            renderOption={(props, option) => (
+              <Grid item xs={10} sm={4} key={props.index}>
+                <Card
+                  {...props}
+                  sx={{ width: "100%", height: "100%" }}
+                  variant="outlined"
+                >
+                  <Grid container justifyContent="space-between">
+                    <Grid item>
+                      <Typography variant="h6" color="primary">
+                        {option.tag_name}
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="body2">{option.tag_type}</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body2" align="justify" gutterBottom>
+                        {option.tag_description}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Card>
+              </Grid>
+            )}
           />
         </Grid>
         <Grid item>

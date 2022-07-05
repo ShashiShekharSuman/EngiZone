@@ -13,8 +13,25 @@ import {
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import SendIcon from "@mui/icons-material/Send";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
+import API from "../axios";
+
 
 const Contact = () => {
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [message, setMessage] = React.useState("");
+
+  const handleSubmit = () => {
+    API.post("contact/")
+      .then((response) => {
+        console.log(response);
+        setName("");
+        setEmail("");
+        setMessage("");
+      })
+      .catch((error) => console.log(error));
+  };
+
   return (
     <Container
       maxWidth={"sm"}
@@ -53,6 +70,10 @@ const Contact = () => {
                 name="name"
                 required
                 fullWidth
+                value={name}
+                onChange={(event) => {
+                  setName(event.target.value);
+                }}
                 id="name"
                 label="Full Name"
               />
@@ -64,6 +85,10 @@ const Contact = () => {
                 id="email"
                 label="Email Address"
                 name="email"
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                }}
                 autoComplete="email"
               />
             </Grid>
@@ -73,6 +98,10 @@ const Contact = () => {
                 fullWidth
                 id="outlined-multiline-static"
                 label="Your Message"
+                value={message}
+                onChange={(event) => {
+                  setMessage(event.target.value);
+                }}
                 multiline
                 rows={8}
               />
@@ -90,6 +119,7 @@ const Contact = () => {
                 component={Button}
                 color="primary"
                 variant="extended"
+                onClick={handleSubmit}
               >
                 <SendIcon sx={{ mr: 1 }} /> Send
               </Fab>

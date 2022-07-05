@@ -10,7 +10,7 @@ const QuestionDetail = () => {
   const [solutions, setSolutions] = useState(null);
   const [loading, setLoading] = useState({ question: true, solutions: true });
   const [body, setBody] = React.useState("");
-  const [bookmark, setBookmark] = React.useState(false);
+  // const [bookmark, setBookmark] = React.useState(false);
   const [showAddAnswer, setShowAddAnswer] = React.useState(false);
 
   useEffect(() => {
@@ -78,25 +78,6 @@ const QuestionDetail = () => {
       });
   };
 
-  const handleBookmark = () => {
-    API.post("bookmarks/", { question: question?.id })
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: Solution.jsx ~ line 107 ~ voteSolution ~ response",
-          response
-        );
-        API.get(`bookmarks/${question.id}/`)
-          .then((response) => setBookmark(response.data.bookmark))
-          .catch((error) => console.log(error));
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: Solution.jsx ~ line 110 ~ voteSolution ~ error",
-          error
-        );
-      });
-  };
-
   return (
     <>
       <Container maxWidth="md">
@@ -126,13 +107,7 @@ const QuestionDetail = () => {
             ) : (
               <Question
                 key={question.id}
-                id={question.id}
-                owner={question.owner}
-                title={question.title}
-                body={question.body}
-                tags={question.tags}
-                created_at={question.created_at}
-                updated_at={question.updated_at}
+                question={question}
                 // loading
               />
             )}

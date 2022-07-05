@@ -12,11 +12,7 @@ import {
 } from "@mui/material";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import {
-  DatePicker,
-  DesktopDatePicker,
-  MobileDatePicker,
-} from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers";
 import React from "react";
 import moment from "moment";
 import EditIcon from "@mui/icons-material/Edit";
@@ -29,7 +25,7 @@ const Input = styled("input")({
 });
 
 const EditProfile = () => {
-  const { user, setUser } = React.useContext(AuthContext);
+  const { user, editProfile } = React.useContext(AuthContext);
 
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
@@ -70,7 +66,6 @@ const EditProfile = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setFetching(true);
     let formData = new FormData();
     formData.append("first_name", firstName);
     formData.append("last_name", lastName);
@@ -78,24 +73,8 @@ const EditProfile = () => {
     formData.append("gender", gender);
     formData.append("phone_no", `${phoneNumber}`);
     if (avatarPreview) formData.append("avatar", avatar);
-    API.patch(`users/${user.id}/`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: EditProfile.jsx ~ line 28 ~ updateUserDetails ~ re̥sponse",
-          response
-        );
-        navigate("/profile");
-        setUser(response.data);
-        console.log(user);
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: EditProfile.jsx ~ line 31 ~ updateUserDetails ~ error",
-          error
-        );
-      });
+    editProfile(formData);
+    navigate("../profile/");
   };
 
   return (
@@ -137,10 +116,7 @@ const EditProfile = () => {
                   type="file"
                 />
                 {!avatarPreview ? (
-                  <Avatar
-                    src={`https://engizone-api.herokuapp.com${user.avatar}`}
-                    sx={{ width: 200, height: 200 }}
-                  />
+                  <Avatar src={user.avatar} sx={{ width: 200, height: 200 }} />
                 ) : (
                   <Avatar
                     src={avatarPreview}

@@ -1,6 +1,5 @@
 import { createContext, useEffect, useState } from "react";
 import API from "../axios";
-import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -13,10 +12,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     setLoading(true);
     if (localStorage.getItem("access")) {
-      API.get("auth/")
+      API.get("users/auth")
         .then((res) => {
           console.log(res);
           setUser(res.data);
+          setLoading(false);
         })
         .catch((error) => {
           if (error.response) {
@@ -37,7 +37,6 @@ export const AuthProvider = ({ children }) => {
           console.log(error.config);
         });
     }
-    setLoading(false);
   }, []);
 
   const signIn = (data) => {
@@ -75,28 +74,36 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
+  const editProfile = (formData) => {
+    setLoading(true);
+    API.patch(`users/${user.id}/`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then((response) => {
+        console.log(
+          "🚀 ~ file: EditProfile.jsx ~ line 28 ~ updateUserDetails ~ re̥sponse",
+          response
+        );
+        setUser(response.data);
+        console.log(user);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(
+          "🚀 ~ file: EditProfile.jsx ~ line 31 ~ updateUserDetails ~ error",
+          error
+        );
+      });
+  };
+
   let contextData = {
     loading: loading,
     user: user,
     signIn: signIn,
     signOut: signOut,
     signUp: signUp,
+    editProfile: editProfile,
   };
-
-  // useEffect(() => {
-  //   if (loading) {
-  //     updateToken();
-  //   }
-
-  //   let fourMinutes = 1000 * 60 * 4;
-
-  //   let interval = setInterval(() => {
-  //     if (authTokens) {
-  //       updateToken();
-  //     }
-  //   }, fourMinutes);
-  //   return () => clearInterval(interval);
-  // }, [authTokens, loading]);
 
   return (
     <AuthContext.Provider value={contextData}>

@@ -7,7 +7,7 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import { QuestionPreview, SearchBar } from "../components";
+import { QuestionPreview, SearchBar, FilterSection } from "../components";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../axios";
 
@@ -57,7 +57,9 @@ const Questions = () => {
             setDefaultSearchQuery={setSearchQuery}
           />
         </Grid>
-
+        <Grid item>
+          <FilterSection />
+        </Grid>
         {loading ? (
           <React.Fragment>
             <QuestionPreview loading />
@@ -96,13 +98,7 @@ const Questions = () => {
             {questions.map((question) => (
               <QuestionPreview
                 key={question.id}
-                id={question.id}
-                owner={question.owner}
-                title={question.title}
-                body={question.body}
-                tags={question.tags}
-                created_at={question.created_at}
-                updated_at={question.updated_at}
+                question={question}
                 // loading
               />
             ))}
