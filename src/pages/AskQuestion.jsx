@@ -15,23 +15,26 @@ import HelpIcon from "@mui/icons-material/Help";
 
 import { useNavigate } from "react-router-dom";
 import API from "../axios";
+import MessageContext from "../contexts/MessageContext";
 
 const AskQuestion = () => {
   const [title, setTitle] = React.useState("");
   const [body, setBody] = React.useState("");
   const [tags, setTags] = React.useState([]);
   const [options, setOptions] = React.useState([]);
+  const { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
   const navigate = useNavigate();
+
   React.useEffect(() => {
     API.get("tags/")
       .then((response) => {
         setOptions(response.data);
       })
       .catch((error) => {
-        console.log(
-          "🚀 ~ file: AskQuestion.jsx ~ line 52 ~ setOptions ~ error",
-          error
-        );
+        setMessage(error.message);
+        setSeverity("error");
+        setSnackBarVisibility(true);
       });
   }, []);
 
@@ -48,12 +51,18 @@ const AskQuestion = () => {
           response
         );
         navigate(`/questions/${response.data.id}`);
+        setMessage("Question posted successfull.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
       })
       .catch((error) => {
         console.log(
           "🚀 ~ file: AskQuestion.jsx ~ line 32 ~ handleSubmit ~ error",
           error
         );
+        setMessage(error.message);
+        setSeverity("error");
+        setSnackBarVisibility(true);
       });
   };
 

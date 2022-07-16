@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Container, Grid, Skeleton, Typography } from "@mui/material";
 import { AddSolution, Question, Solution } from "../components";
 import API from "../axios";
+import MessageContext from "../contexts/MessageContext";
 import { useParams } from "react-router-dom";
 
 const QuestionDetail = () => {
@@ -12,6 +13,8 @@ const QuestionDetail = () => {
   const [body, setBody] = React.useState("");
   // const [bookmark, setBookmark] = React.useState(false);
   const [showAddAnswer, setShowAddAnswer] = React.useState(false);
+  const { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
 
   useEffect(() => {
     setLoading({ question: true, solutions: true });
@@ -51,13 +54,19 @@ const QuestionDetail = () => {
           response
         );
         setSolutions((prev) => prev.concat(response.data));
+        setMessage("Thanks for your submission.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
         setShowAddAnswer(false);
       })
       .catch((error) => {
-        console.log(
-          "🚀 ~ file: AskQuestion.jsx ~ line 32 ~ handleSubmit ~ error",
-          error
-        );
+        // console.log(
+        //   "🚀 ~ file: AskQuestion.jsx ~ line 32 ~ handleSubmit ~ error",
+        //   error
+        // );
+        setMessage(error.message);
+        setSeverity("error");
+        setSnackBarVisibility(true);
       });
   };
 
@@ -69,12 +78,14 @@ const QuestionDetail = () => {
           response
         );
         setSolutions((prev) => prev.filter((solution) => solution.id !== id));
+        setMessage("Solution deleted successfull.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
       })
       .catch((error) => {
-        console.log(
-          "🚀 ~ file: QuestionDetail.jsx ~ line 30 ~ deleteSolutionById ~ error",
-          error
-        );
+        setMessage(error.response.data.detail);
+        setSeverity("error");
+        setSnackBarVisibility(true);
       });
   };
 

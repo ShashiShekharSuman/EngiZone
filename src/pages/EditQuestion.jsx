@@ -14,6 +14,7 @@ import TextEditor from "../components/TextEditor";
 import HelpIcon from "@mui/icons-material/Help";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../axios";
+import MessageContext from "../contexts/MessageContext";
 
 const EditQuestion = () => {
   const { id } = useParams();
@@ -23,6 +24,8 @@ const EditQuestion = () => {
   const [tags, setTags] = React.useState([]);
   const [options, setOptions] = React.useState([]);
   const [changes, setChanges] = React.useState({});
+  let { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -64,7 +67,9 @@ const EditQuestion = () => {
           "🚀 ~ file: EditQuestion.jsx ~ line 53 ~ .then ~ response",
           response
         );
-
+        setMessage("Question updated successfull.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
         navigate(`/questions/${response.data.id}`);
       })
       .catch((error) => {
@@ -72,6 +77,9 @@ const EditQuestion = () => {
           "🚀 ~ file: EditQuestion.jsx ~ line 58 ~ handleSubmit ~ error",
           error
         );
+        setMessage(error.message);
+        setSeverity("error");
+        setSnackBarVisibility(true);
       });
   };
 

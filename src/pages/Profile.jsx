@@ -25,6 +25,7 @@ import LinkIcon from "@mui/icons-material/Link";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import API from "../axios";
 import AuthContext from "../contexts/AuthContext";
+import MessageContext from "../contexts/MessageContext";
 
 const StatsCard = () => {
   return (
@@ -67,6 +68,8 @@ const Profile = () => {
   const { user } = React.useContext(AuthContext);
   // const [userDetails, setUserDetails] = React.useState(null);
   const [questions, setQuestions] = React.useState([]);
+  const { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
 
   React.useEffect(() => {
     if (user) {
@@ -93,10 +96,9 @@ const Profile = () => {
           setQuestions(response.data.questions);
         })
         .catch((error) => {
-          console.log(
-            "🚀 ~ file: Profile.jsx ~ line 74 ~ getQuestionsByAuthorId ~ error",
-            error
-          );
+          setMessage(error.message);
+          setSeverity("error");
+          setSnackBarVisibility(true);
         });
     }
   }, [user, user?._id]);

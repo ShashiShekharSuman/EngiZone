@@ -5,14 +5,17 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 // import State from "./context/user/state";
 import { AuthProvider } from "./contexts/AuthContext";
+import { MessageProvider } from "./contexts/MessageContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     {/* <State> */}
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    <MessageProvider>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </MessageProvider>
 
     {/* </State> */}
   </React.StrictMode>

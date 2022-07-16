@@ -29,12 +29,15 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import moment from "moment";
 import parse from "html-react-parser";
 import AuthContext from "../contexts/AuthContext";
+import MessageContext from "../contexts/MessageContext";
 import API from "../axios";
 
 const Question = ({ question, loading }) => {
   const { user } = React.useContext(AuthContext);
   const [bookmark, setBookmark] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -56,6 +59,9 @@ const Question = ({ question, loading }) => {
           "🚀 ~ file: Question.jsx ~ line 37 ~ deleteQuestionById ~ response",
           response
         );
+        setMessage("Question deleted successfull.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
         navigate("/questions");
       })
       .catch((error) => {
@@ -63,6 +69,9 @@ const Question = ({ question, loading }) => {
           "🚀 ~ file: Question.jsx ~ line 40 ~ deleteQuestionById ~ error",
           error
         );
+        setMessage(error.message);
+        setSeverity("error");
+        setSnackBarVisibility(true);
       });
   };
 

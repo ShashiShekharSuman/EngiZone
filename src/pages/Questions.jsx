@@ -10,6 +10,7 @@ import {
 import { QuestionPreview, SearchBar, FilterSection } from "../components";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../axios";
+import MessageContext from "../contexts/MessageContext";
 
 const Questions = () => {
   const url = new URL(window.location);
@@ -22,6 +23,9 @@ const Questions = () => {
   const [page, setPage] = useState(() =>
     url.searchParams.get("page") ? parseInt(url.searchParams.get("page")) : 1
   );
+  const { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
+
   useEffect(() => {
     setLoading(true);
     API.get(`problems/${url.search}`)
@@ -31,14 +35,14 @@ const Questions = () => {
         setLoading(false);
       })
       .catch((error) => {
-        console.log(error);
-        // setLoading(false);
+        setMessage(error.message);
+        setSeverity("error");
+        setSnackBarVisibility(true);
       });
   }, [page, searchQuery]);
 
-  console.log(questions);
-
   const navigate = useNavigate();
+
   return (
     <Container maxWidth="md">
       <Grid

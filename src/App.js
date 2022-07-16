@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Box, Container } from "@mui/material";
+import { Box, Container, SnackbarContent } from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Fab from "@mui/material/Fab";
@@ -9,7 +9,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Zoom from "@mui/material/Zoom";
 // import LinearProgress from "@mui/material/LinearProgress";
 // import AuthContext from "./contexts/AuthContext";
-import { NavBar, Footer } from "./components";
+import { NavBar, Footer, SnackBar } from "./components";
 
 import {
   Home,
@@ -128,6 +128,7 @@ const App = () => {
               <KeyboardArrowUpIcon />
             </Fab>
           </ScrollTop>
+          <SnackBar />
         </Box>
       </Router>
     </ThemeProvider>

@@ -1,5 +1,6 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useContext } from "react";
 import API from "../axios";
+import MessageContext from "./MessageContext";
 
 const AuthContext = createContext();
 
@@ -7,34 +8,69 @@ export default AuthContext;
 
 export const AuthProvider = ({ children }) => {
   let [user, setUser] = useState(null);
-  let [loading, setLoading] = useState(true);
+  let [loading, setLoading] = useState(false);
+  let { setMessage, setSnackBarVisibility, setSeverity } =
+    useContext(MessageContext);
+
+  API.interceptors.response.use(
+    (res) => {
+      return res;
+    },
+    async (err) => {
+      if (err.config.url !== "login/" && err.response) {
+        // Access Token Expired
+        console.log(err);
+        if (err.response.status === 401 && !err.config._retry) {
+          err.config._retry = true;
+          // try {
+          const refresh = localStorage.getItem("refresh");
+          await API.post("refresh/", { refresh })
+            .then((res) => {
+              localStorage.setItem("access", res.data.access);
+              localStorage.setItem("refresh", res.data.refresh);
+            })
+            .catch((_error) => {
+              // Refreash Token Expired
+              signOut();
+              setMessage(
+                _error.response.status === 401
+                  ? "Sesson Expired"
+                  : _error.message
+              );
+              setSeverity(_error.response.status === 401 ? "info" : "error");
+              setSnackBarVisibility(true);
+              // return Promise.reject(_error);
+            });
+          return API(err.config);
+          // } catch (_error) {
+          //   return Promise.reject(_error);
+          // }
+        }
+      }
+      return Promise.reject(err);
+    }
+  );
 
   useEffect(() => {
-    setLoading(true);
     if (localStorage.getItem("access")) {
+      setLoading(true);
       API.get("users/auth")
         .then((res) => {
           console.log(res);
           setUser(res.data);
+          setMessage(
+            "Welcome back " + res.data.first_name + " " + res.data.last_name
+          );
+          setSeverity("");
+          setSnackBarVisibility(true);
           setLoading(false);
         })
         .catch((error) => {
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            console.log(error.response.status);
-            console.log(error.response.data);
-            console.log(error.response.headers);
-          } else if (error.request) {
-            // The request was made but no response was received
-            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-            // http.ClientRequest in node.js
-            console.log(error.request);
-          } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log("Error", error.message);
-          }
-          console.log(error.config);
+          setMessage(
+            error.message
+          );
+          setSeverity("error");
+          setSnackBarVisibility(true);
         });
     }
   }, []);
@@ -46,23 +82,40 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("access", res.data.token.access);
         localStorage.setItem("refresh", res.data.token.refresh);
         setUser(res.data.user);
+        setMessage(`Hi ${res.data.user.first_name} ${res.data.user.last_name}`);
+        setSeverity("success");
+        setSnackBarVisibility(true);
         setLoading(false);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        setMessage(
+          error.response.data ? error.response.data.detail : error.message
+        );
+        setSeverity("error");
+        setSnackBarVisibility(true);
+      });
   };
 
-  const signUp = (data) => {
+  const signUp = (data, setError) => {
     setLoading(true);
     API.post("users/", data)
       .then((res) => {
-        console.log(res.data);
+        console.log(res);
         // navigate("/");
         const email = data.email;
         const password = data.password;
         signIn({ email, password });
+        setMessage("Your account has been successfully created.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
         setLoading(false);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        setMessage(error.message);
+        setSeverity("error");
+        setSnackBarVisibility(true);
+        setError(error.response?.data);
+      });
   };
 
   let signOut = () => {
@@ -71,10 +124,13 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
+    setMessage("Your have been logged out.");
+    setSeverity("info");
+    setSnackBarVisibility(true);
     setLoading(false);
   };
 
-  const editProfile = (formData) => {
+  const editProfile = (formData, setError) => {
     setLoading(true);
     API.patch(`users/${user.id}/`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -86,13 +142,16 @@ export const AuthProvider = ({ children }) => {
         );
         setUser(response.data);
         console.log(user);
+        setMessage("Your changes have been saved.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
         setLoading(false);
       })
       .catch((error) => {
-        console.log(
-          "🚀 ~ file: EditProfile.jsx ~ line 31 ~ updateUserDetails ~ error",
-          error
-        );
+        setMessage(error.message);
+        setSeverity("error");
+        setSnackBarVisibility(true);
+        setError(error.response.data);
       });
   };
 

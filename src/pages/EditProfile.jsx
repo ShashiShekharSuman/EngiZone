@@ -35,7 +35,8 @@ const EditProfile = () => {
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [avatar, setAvatar] = React.useState(null);
   const [avatarPreview, setAvatarPreview] = React.useState(null);
-  const [fetching, setFetching] = React.useState(true);
+  const [error, setError] = React.useState({});
+  // const [fetching, setFetching] = React.useState(true);
 
   const navigate = useNavigate();
 
@@ -73,7 +74,7 @@ const EditProfile = () => {
     formData.append("gender", gender);
     formData.append("phone_no", `${phoneNumber}`);
     if (avatarPreview) formData.append("avatar", avatar);
-    editProfile(formData);
+    editProfile(formData, setError);
     navigate("../profile/");
   };
 
@@ -110,13 +111,14 @@ const EditProfile = () => {
                 }}
               >
                 <Input
+                  // error={error.avatar}
                   accept="image/*"
                   id="icon-button-file"
                   onChange={handleAvatarChange}
                   type="file"
                 />
                 {!avatarPreview ? (
-                  <Avatar src={user.avatar} sx={{ width: 200, height: 200 }} />
+                  <Avatar src={user?.avatar} sx={{ width: 200, height: 200 }} />
                 ) : (
                   <Avatar
                     src={avatarPreview}
@@ -127,6 +129,7 @@ const EditProfile = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
+                error={error.first_name}
                 autoComplete="given-name"
                 name="firstName"
                 required
@@ -136,10 +139,12 @@ const EditProfile = () => {
                 value={firstName}
                 onChange={(event) => setFirstName(event.target.value)}
                 autoFocus
+                helperText={error.first_name}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
+                error={error.last_name}
                 required
                 fullWidth
                 id="lastName"
@@ -148,6 +153,7 @@ const EditProfile = () => {
                 value={lastName}
                 onChange={(event) => setLastName(event.target.value)}
                 autoComplete="family-name"
+                helperText={error.last_name}
               />
             </Grid>
             <Grid item xs={12}>
@@ -162,10 +168,12 @@ const EditProfile = () => {
                 inputProps={{ readOnly: true }}
                 InputLabelProps={{ shrink: true }}
                 autoComplete="email"
+                helperText={error.email}
               />
             </Grid>
             <Grid item xs={12} container justifyContent="space-between">
               <TextField
+                error={error.gender}
                 value={gender}
                 required
                 sx={{ width: "49%" }}
@@ -173,13 +181,16 @@ const EditProfile = () => {
                 id="gender"
                 onChange={(event) => setGender(event.target.value)}
                 label="Gender"
+                helperText={error.gender}
               >
+                <MenuItem value={null} />
                 <MenuItem value={"M"}>Male</MenuItem>
                 <MenuItem value={"F"}>Female</MenuItem>
                 <MenuItem value={"O"}>Other</MenuItem>
               </TextField>
               <LocalizationProvider dateAdapter={AdapterMoment}>
                 <DatePicker
+                  // error={error.date_of_birth}
                   label="Date of Birth"
                   inputFormat="DD/MM/YYYY"
                   value={dateOfBirth}
@@ -188,13 +199,20 @@ const EditProfile = () => {
                     setDateOfBirth(date);
                   }}
                   renderInput={(params) => (
-                    <TextField {...params} required sx={{ width: "49%" }} />
+                    <TextField
+                      {...params}
+                      error={error.date_of_birth}
+                      helperText={error.date_of_birth}
+                      required
+                      sx={{ width: "49%" }}
+                    />
                   )}
                 />
               </LocalizationProvider>
             </Grid>
             <Grid item xs={12}>
               <TextField
+                error={error.phone_no}
                 required
                 fullWidth
                 value={phoneNumber}
@@ -202,6 +220,7 @@ const EditProfile = () => {
                 name="mobile-number"
                 label="Mobile Number"
                 id="mobile-number"
+                helperText={error.phone_no}
               />
             </Grid>
           </Grid>

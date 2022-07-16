@@ -21,6 +21,7 @@ const RoundedTextField = styled(TextField)({
 const SearchBar = ({ defaultSearchQuery, setDefaultSearchQuery }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = React.useState("");
+  
   return (
     <Box
       component="form"

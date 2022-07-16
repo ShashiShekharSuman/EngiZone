@@ -31,34 +31,42 @@ API.interceptors.request.use((req) => {
 //     return Promise.reject(error);
 //   }
 // );
-API.interceptors.response.use(
-  (res) => {
-    return res;
-  },
-  async (err) => {
-    if (err.config.url !== "/login" && err.response) {
-      // Access Token was expired
-      if (err.response.status === 401 && !err.config._retry) {
-        err.config._retry = true;
-        // try {
-        const refresh = localStorage.getItem("refresh");
-        await API.post("refresh/", { refresh })
-          .then((res) => {
-            localStorage.setItem("access", res.data.access);
-            localStorage.setItem("refresh", res.data.refresh);
-          })
-          .catch((_error) => {
-            console.log(_error);
-            return Promise.reject(_error);
-          });
-        return API(err.config);
-        // } catch (_error) {
-        //   return Promise.reject(_error);
-        // }
-      }
-    }
-    return Promise.reject(err);
-  }
-);
+
+// API.interceptors.response.use(
+//   (res) => {
+//     return res;
+//   },
+//   async (err) => {
+//     if (
+//       err.config.url !== "login/" &&
+//       err.config.url !== "refresh/" &&
+//       err.response
+//     ) {
+//       // Access Token was expired
+//       console.log(err);
+//       if (err.response.status === 401 && !err.config._retry) {
+//         err.config._retry = true;
+//         // try {
+//         const refresh = localStorage.getItem("refresh");
+//         await API.post("refresh/", { refresh })
+//           .then((res) => {
+//             localStorage.setItem("access", res.data.access);
+//             localStorage.setItem("refresh", res.data.refresh);
+//           })
+//           .catch((_error) => {
+//             console.log(_error);
+//             localStorage.removeItem("access");
+//             localStorage.removeItem("refresh");
+//             return Promise.reject(_error);
+//           });
+//         return API(err.config);
+//         // } catch (_error) {
+//         //   return Promise.reject(_error);
+//         // }
+//       }
+//     }
+//     return Promise.reject(err);
+//   }
+// );
 
 export default API;

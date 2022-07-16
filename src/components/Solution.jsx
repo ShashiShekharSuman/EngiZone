@@ -26,6 +26,7 @@ import {
 } from "@mui/material";
 
 import AuthContext from "../contexts/AuthContext";
+import MessageContext from "../contexts/MessageContext";
 import { Comment } from "../components";
 import SendIcon from "@mui/icons-material/Send";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -82,6 +83,8 @@ const Solution = ({ sol, handleDelete, loading }) => {
   const [solutionText, setSolutionText] = React.useState(
     solution ? solution : null
   );
+  const { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
 
   React.useEffect(() => {
     if (solution) {
@@ -135,6 +138,9 @@ const Solution = ({ sol, handleDelete, loading }) => {
         API.get(`solutions/${solution.id}`)
           .then((response) => setSolution(response.data))
           .catch((error) => console.log(error));
+        setMessage("Thanks for your vote.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
       })
       .catch((error) => {
         console.log(
@@ -153,6 +159,9 @@ const Solution = ({ sol, handleDelete, loading }) => {
         .then((res) => {
           setComments(res.data);
           console.log(comments);
+          setMessage("Thanks for your comment.");
+          setSeverity("success");
+          setSnackBarVisibility(true);
           setFetching(false);
         })
         .catch((error) => {

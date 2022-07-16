@@ -18,13 +18,13 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/AuthContext";
 
 const SignUp = () => {
-  const user = React.useContext(AuthContext).user;
-  const signUp = React.useContext(AuthContext).signUp;
+  const { user, signUp } = React.useContext(AuthContext);
   const [first_name, setFirstName] = React.useState("");
   const [last_name, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirm_password, setConfirmPassword] = React.useState("");
+  const [error, setError] = React.useState({});
 
   const navigate = useNavigate();
 
@@ -34,7 +34,10 @@ const SignUp = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    signUp({ first_name, last_name, email, password, confirm_password });
+    signUp(
+      { first_name, last_name, email, password, confirm_password },
+      setError
+    );
   };
 
   return (
@@ -59,6 +62,7 @@ const SignUp = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
+                error={error?.first_name}
                 autoComplete="given-name"
                 name="firstName"
                 required
@@ -68,10 +72,12 @@ const SignUp = () => {
                 autoFocus
                 value={first_name}
                 onChange={(event) => setFirstName(event.target.value)}
+                helperText={error?.first_name}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
+                error={error?.last_name}
                 required
                 fullWidth
                 id="lastName"
@@ -80,10 +86,12 @@ const SignUp = () => {
                 autoComplete="family-name"
                 value={last_name}
                 onChange={(event) => setLastName(event.target.value)}
+                helperText={error?.last_name}
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
+                error={error?.email}
                 required
                 fullWidth
                 id="email"
@@ -92,10 +100,12 @@ const SignUp = () => {
                 autoComplete="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
+                helperText={error?.email}
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
+                error={error?.password}
                 required
                 fullWidth
                 name="password"
@@ -105,10 +115,12 @@ const SignUp = () => {
                 autoComplete="new-password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
+                helperText={error?.password}
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
+                error={password !== confirm_password}
                 required
                 fullWidth
                 name="confirm-password"
@@ -118,6 +130,11 @@ const SignUp = () => {
                 autoComplete="new-password"
                 value={confirm_password}
                 onChange={(event) => setConfirmPassword(event.target.value)}
+                helperText={
+                  password !== confirm_password
+                    ? "Passwords do not match."
+                    : null
+                }
               />
             </Grid>
             <Grid item xs={12}>
