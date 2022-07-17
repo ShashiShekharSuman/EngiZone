@@ -137,7 +137,7 @@ export const AuthProvider = ({ children }) => {
         //   response
         // );
         setUser(response.data);
-        console.log(user);
+        // console.log(user);
         setMessage("Your changes have been saved.");
         setSeverity("success");
         setSnackBarVisibility(true);

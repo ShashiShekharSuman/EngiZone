@@ -36,7 +36,7 @@ const SignIn = () => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    console.log("=>(SignIn.jsx:39) useEffect user", user);
+    // console.log("=>(SignIn.jsx:39) useEffect user", user);
     if (user) navigate("/");
   }, [user]);
 

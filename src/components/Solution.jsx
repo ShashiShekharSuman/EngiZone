@@ -133,10 +133,10 @@ const Solution = ({ sol, handleDelete, loading }) => {
   const handleVote = (vote) => {
     API.post("votes/", { solution: solution.id, vote: vote }).then(
       (response) => {
-        console.log(
-          "🚀 ~ file: Solution.jsx ~ line 107 ~ voteSolution ~ response",
-          response
-        );
+        // console.log(
+        //   "🚀 ~ file: Solution.jsx ~ line 107 ~ voteSolution ~ response",
+        //   response
+        // );
         setVote(response.data.vote);
         API.get(`solutions/${solution.id}`)
           .then((response) => setSolution(response.data))
@@ -155,13 +155,14 @@ const Solution = ({ sol, handleDelete, loading }) => {
   };
 
   const handleViewComments = () => {
-    console.log(viewComments);
+    // console.log(viewComments);
     setViewComments((prev) => !prev);
     setFetching(true);
     if (!viewComments) {
       API.get(`comments/?solution=${solution.id}`).then((res) => {
         setComments(res.data);
-        console.log(comments);
+        // console.log(comments);
+        setFetching(false);
       });
       // .catch((error) => {
       //   console.log(error);
