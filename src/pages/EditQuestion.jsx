@@ -29,28 +29,26 @@ const EditQuestion = () => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    API.get(`problems/${id}`)
-      .then((response) => {
-        setTitle(response.data.title);
-        setBody(response.data.body);
-        setTags(response.data.tags);
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: EditQuestion.jsx ~ line 31 ~ getQuestionById ~ error",
-          error
-        );
-      });
-    API.get("tags/")
-      .then((response) => {
-        setOptions(response.data);
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: AskQuestion.jsx ~ line 52 ~ setOptions ~ error",
-          error
-        );
-      });
+    API.get(`problems/${id}`).then((response) => {
+      setTitle(response.data.title);
+      setBody(response.data.body);
+      setTags(response.data.tags);
+    });
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: EditQuestion.jsx ~ line 31 ~ getQuestionById ~ error",
+    //     error
+    //   );
+    // });
+    API.get("tags/").then((response) => {
+      setOptions(response.data);
+    });
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: AskQuestion.jsx ~ line 52 ~ setOptions ~ error",
+    //     error
+    //   );
+    // });
   }, []);
 
   const handleBodyChange = (event, editor) => {
@@ -61,26 +59,27 @@ const EditQuestion = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    API.patch(`problems/${id}/`, { title: title, body: body, tags: tags })
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: EditQuestion.jsx ~ line 53 ~ .then ~ response",
-          response
-        );
-        setMessage("Question updated successfull.");
+    API.patch(`problems/${id}/`, { title: title, body: body, tags: tags }).then(
+      (response) => {
+        // console.log(
+        //   "🚀 ~ file: EditQuestion.jsx ~ line 53 ~ .then ~ response",
+        //   response
+        // );
+        setMessage("Question updated successfully.");
         setSeverity("success");
         setSnackBarVisibility(true);
         navigate(`/questions/${response.data.id}`);
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: EditQuestion.jsx ~ line 58 ~ handleSubmit ~ error",
-          error
-        );
-        setMessage(error.message);
-        setSeverity("error");
-        setSnackBarVisibility(true);
-      });
+      }
+    );
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: EditQuestion.jsx ~ line 58 ~ handleSubmit ~ error",
+    //     error
+    //   );
+    //   setMessage(error.message);
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
   };
 
   return (

@@ -16,7 +16,7 @@ const SnackBar = () => {
     React.useContext(MessageContext);
 
   const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
+    if (severity && reason === "clickaway") {
       return;
     }
     setSnackBarVisibility(false);
@@ -29,11 +29,14 @@ const SnackBar = () => {
       open={isSnackBarVisible}
       TransitionComponent={TransitionRight}
       onClose={handleClose}
+      message={message}
       // key=
     >
-      <Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
-        {message}
-      </Alert>
+      {severity && (
+        <Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
+          {message}
+        </Alert>
+      )}
     </Snackbar>
   );
 };

@@ -21,7 +21,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const FilterSection = () => {
   const [open, setOpen] = React.useState(false);
-  const [filters, setFilters] = React.useState(["Lorem", "Ipsum"]);
+  const [filters, setFilters] = React.useState(["None"]);
   const handleClickOpen = () => {
     setOpen(true);
   };

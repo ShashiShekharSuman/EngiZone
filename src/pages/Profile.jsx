@@ -87,19 +87,18 @@ const Profile = () => {
       //       error
       //     );
       //   });
-      API.get(`problems/?owner=${user?.id}`)
-        .then((response) => {
-          console.log(
-            "🚀 ~ file: Profile.jsx ~ line 71 ~ getQuestionsByAuthorId ~ response",
-            response
-          );
-          setQuestions(response.data.questions);
-        })
-        .catch((error) => {
-          setMessage(error.message);
-          setSeverity("error");
-          setSnackBarVisibility(true);
-        });
+      API.get(`problems/?owner=${user?.id}`).then((response) => {
+        // console.log(
+        //   "🚀 ~ file: Profile.jsx ~ line 71 ~ getQuestionsByAuthorId ~ response",
+        //   response
+        // );
+        setQuestions(response.data.questions);
+      });
+      // .catch((error) => {
+      //   setMessage(error.message);
+      //   setSeverity("error");
+      //   setSnackBarVisibility(true);
+      // });
     }
   }, [user, user?._id]);
 

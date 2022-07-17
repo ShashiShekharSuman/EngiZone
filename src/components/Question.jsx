@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Avatar,
   Typography,
@@ -41,38 +41,36 @@ const Question = ({ question, loading }) => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    if (question) {
+    if (question && user) {
       API.get(`bookmarks/${question.id}/`)
         .then((response) => setBookmark(true))
         .catch((error) => {
-          // console.log(error);
           setBookmark(false);
         });
     }
-  }, []);
+  }, [user]);
 
   const handleDeleteQuestion = () => {
     handleClose();
-    API.delete(`problems/${question.id}`)
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: Question.jsx ~ line 37 ~ deleteQuestionById ~ response",
-          response
-        );
-        setMessage("Question deleted successfull.");
-        setSeverity("success");
-        setSnackBarVisibility(true);
-        navigate("/questions");
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: Question.jsx ~ line 40 ~ deleteQuestionById ~ error",
-          error
-        );
-        setMessage(error.message);
-        setSeverity("error");
-        setSnackBarVisibility(true);
-      });
+    API.delete(`problems/${question.id}`).then((response) => {
+      console.log(
+        "🚀 ~ file: Question.jsx ~ line 37 ~ deleteQuestionById ~ response",
+        response
+      );
+      setMessage("Question deleted successfull.");
+      setSeverity("success");
+      setSnackBarVisibility(true);
+      navigate("/questions");
+    });
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: Question.jsx ~ line 40 ~ deleteQuestionById ~ error",
+    //     error
+    //   );
+    //   setMessage(error.message);
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
   };
 
   const handleClickOpen = () => {
@@ -84,23 +82,22 @@ const Question = ({ question, loading }) => {
   };
 
   const handleBookmark = () => {
-    API.post("bookmarks/", { question: question?.id })
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: Solution.jsx ~ line 107 ~ voteSolution ~ response",
-          response
-        );
-        setBookmark(response.status == 201 ? true : false);
-        // API.get(`bookmarks/${question.id}/`)
-        //   .then((response) => setBookmark(response.data.bookmark))
-        //   .catch((error) => console.log(error));
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: Solution.jsx ~ line 110 ~ voteSolution ~ error",
-          error
-        );
-      });
+    API.post("bookmarks/", { question: question?.id }).then((response) => {
+      console.log(
+        "🚀 ~ file: Solution.jsx ~ line 107 ~ voteSolution ~ response",
+        response
+      );
+      setBookmark(response.status == 201 ? true : false);
+      // API.get(`bookmarks/${question.id}/`)
+      //   .then((response) => setBookmark(response.data.bookmark))
+      //   .catch((error) => console.log(error));
+    });
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: Solution.jsx ~ line 110 ~ voteSolution ~ error",
+    //     error
+    //   );
+    // });
   };
 
   return (

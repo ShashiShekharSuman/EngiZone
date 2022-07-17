@@ -12,4 +12,3 @@ export { default as SearchBar } from "./SearchBar";
 export { default as FilterSection } from "./FilterSection";
 export { default as AddSolution } from "./AddSolution";
 export { default as SnackBar } from "./SnackBar";
-export { default as Error } from "./Error";

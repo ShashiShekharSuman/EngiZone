@@ -28,17 +28,16 @@ const Questions = () => {
 
   useEffect(() => {
     setLoading(true);
-    API.get(`problems/${url.search}`)
-      .then((res) => {
-        setQuestions(res.data.questions);
-        setCount(res.data.total_pages);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setMessage(error.message);
-        setSeverity("error");
-        setSnackBarVisibility(true);
-      });
+    API.get(`problems/${url.search}`).then((res) => {
+      setQuestions(res.data.questions);
+      setCount(res.data.total_pages);
+      setLoading(false);
+    });
+    // .catch((error) => {
+    //   setMessage(error.message);
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
   }, [page, searchQuery]);
 
   const navigate = useNavigate();

@@ -27,15 +27,14 @@ const AskQuestion = () => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    API.get("tags/")
-      .then((response) => {
-        setOptions(response.data);
-      })
-      .catch((error) => {
-        setMessage(error.message);
-        setSeverity("error");
-        setSnackBarVisibility(true);
-      });
+    API.get("tags/").then((response) => {
+      setOptions(response.data);
+    });
+    // .catch((error) => {
+    //   setMessage(error.message);
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
   }, []);
 
   const handleBodyChange = (event, editor) => {
@@ -46,20 +45,20 @@ const AskQuestion = () => {
     event.preventDefault();
     API.post("problems/", { title: title, body: body, tags: tags })
       .then((response) => {
-        console.log(
-          "🚀 ~ file: AskQuestion.jsx ~ line 29 ~ .then ~ response",
-          response
-        );
+        // console.log(
+        //   "🚀 ~ file: AskQuestion.jsx ~ line 29 ~ .then ~ response",
+        //   response
+        // );
         navigate(`/questions/${response.data.id}`);
         setMessage("Question posted successfull.");
         setSeverity("success");
         setSnackBarVisibility(true);
       })
       .catch((error) => {
-        console.log(
-          "🚀 ~ file: AskQuestion.jsx ~ line 32 ~ handleSubmit ~ error",
-          error
-        );
+        // console.log(
+        //   "🚀 ~ file: AskQuestion.jsx ~ line 32 ~ handleSubmit ~ error",
+        //   error
+        // );
         setMessage(error.message);
         setSeverity("error");
         setSnackBarVisibility(true);

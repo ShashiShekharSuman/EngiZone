@@ -24,9 +24,6 @@ import moment from "moment";
 import parse from "html-react-parser";
 
 const QuestionPreview = ({ question, loading }) => {
-  const [bookmark, setBookmark] = React.useState(true);
-  const [favorite, setFavorite] = React.useState(true);
-
   return (
     <Grid item>
       <Card variant="outlined">
@@ -52,22 +49,6 @@ const QuestionPreview = ({ question, loading }) => {
           action={
             loading ? null : (
               <>
-                <IconButton
-                  aria-label="add to favorites"
-                  onClick={() => setFavorite((prev) => !prev)}
-                >
-                  <FavoriteIcon sx={!favorite ? { color: red[500] } : {}} />
-                </IconButton>
-                <IconButton
-                  aria-label="bookmark"
-                  onClick={() => setBookmark((prev) => !prev)}
-                >
-                  {!bookmark ? (
-                    <BookmarkAddedIcon sx={{ color: "green" }} />
-                  ) : (
-                    <BookmarkIcon />
-                  )}
-                </IconButton>
                 <IconButton aria-label="share">
                   <ShareIcon />
                 </IconButton>

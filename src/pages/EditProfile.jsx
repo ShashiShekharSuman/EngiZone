@@ -55,14 +55,14 @@ const EditProfile = () => {
   const handleAvatarChange = (event) => {
     setAvatar(event.target.files[0]);
     setAvatarPreview(URL.createObjectURL(event.target.files[0]));
-    console.log(
-      "🚀 ~ file: EditProfile.jsx ~ line 120 ~ EditProfile ~ previewFile",
-      avatarPreview
-    );
-    console.log(
-      "🚀 ~ file: EditProfile.jsx ~ line 120 ~ EditProfile ~ avatarFile",
-      avatar
-    );
+    // console.log(
+    //   "🚀 ~ file: EditProfile.jsx ~ line 120 ~ EditProfile ~ previewFile",
+    //   avatarPreview
+    // );
+    // console.log(
+    //   "🚀 ~ file: EditProfile.jsx ~ line 120 ~ EditProfile ~ avatarFile",
+    //   avatar
+    // );
   };
 
   const handleSubmit = (event) => {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   AppBar,
   Box,
@@ -29,8 +29,6 @@ const LinearIndeterminate = () => {
 
 const NavBar = () => {
   const { user, signOut, loading } = React.useContext(AuthContext);
-  console.log("=>(NavBar.jsx:24) user", user);
-
   const pages = ["Home", "Questions", "Resources", "Contact Us"];
   const settings = ["Profile", "Account", "Dashboard", "Logout"];
 

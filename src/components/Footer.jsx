@@ -31,9 +31,6 @@ function Copyright() {
 }
 
 const Footer = () => {
-  const pages = ["Home", "Questions", "Resources", "Contact Us"];
-  const settings = ["Profile", "Account", "Dashboard", "Logout"];
-
   return (
     <Box
       component="footer"

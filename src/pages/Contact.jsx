@@ -24,8 +24,8 @@ const Contact = () => {
     React.useContext(MessageContext);
 
   const handleSubmit = () => {
-    API.post("contact/", { name: name, email: email, message: message })
-      .then((response) => {
+    API.post("contact/", { name: name, email: email, message: message }).then(
+      (response) => {
         console.log(response);
         setName("");
         setEmail("");
@@ -33,14 +33,15 @@ const Contact = () => {
         setMessage("Thanks for contacting us :)");
         setSeverity("success");
         setSnackBarVisibility(true);
-      })
-      .catch((error) => {
-        setMessage(
-          error.response.data ? error.response.data.detail : error.message
-        );
-        setSeverity("error");
-        setSnackBarVisibility(true);
-      });
+      }
+    );
+    // .catch((error) => {
+    //   setMessage(
+    //     error.response.data ? error.response.data.detail : error.message
+    //   );
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
   };
 
   return (

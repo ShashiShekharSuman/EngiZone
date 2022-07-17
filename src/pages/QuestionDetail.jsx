@@ -19,25 +19,23 @@ const QuestionDetail = () => {
   useEffect(() => {
     setLoading({ question: true, solutions: true });
 
-    API.get(`problems/${id}/`)
-      .then((res) => {
-        setQuestion(res.data);
-        setLoading((load) => ({ ...load, question: false }));
-      })
-      .catch((error) => {
-        console.log(error);
-        // setLoading((load) => ({ ...load, question: false }));
-      });
+    API.get(`problems/${id}/`).then((res) => {
+      setQuestion(res.data);
+      setLoading((load) => ({ ...load, question: false }));
+    });
+    // .catch((error) => {
+    //   console.log(error);
+    //   // setLoading((load) => ({ ...load, question: false }));
+    // });
 
-    API.get(`solutions/?question=${id}`)
-      .then((res) => {
-        setSolutions(res.data);
-        setLoading((load) => ({ ...load, solutions: false }));
-      })
-      .catch((error) => {
-        console.log(error);
-        // setLoading((load) => ({ ...load, solutions: false }));
-      });
+    API.get(`solutions/?question=${id}`).then((res) => {
+      setSolutions(res.data);
+      setLoading((load) => ({ ...load, solutions: false }));
+    });
+    // .catch((error) => {
+    //   console.log(error);
+    //   // setLoading((load) => ({ ...load, solutions: false }));
+    // });
   }, [id]);
 
   const handleBodyChange = (event, editor) => {
@@ -47,8 +45,8 @@ const QuestionDetail = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    API.post("solutions/", { question: question?.id, solution: body })
-      .then((response) => {
+    API.post("solutions/", { question: question?.id, solution: body }).then(
+      (response) => {
         console.log(
           "🚀 ~ file: AskQuestion.jsx ~ line 29 ~ .then ~ response",
           response
@@ -58,35 +56,35 @@ const QuestionDetail = () => {
         setSeverity("success");
         setSnackBarVisibility(true);
         setShowAddAnswer(false);
-      })
-      .catch((error) => {
-        // console.log(
-        //   "🚀 ~ file: AskQuestion.jsx ~ line 32 ~ handleSubmit ~ error",
-        //   error
-        // );
-        setMessage(error.message);
-        setSeverity("error");
-        setSnackBarVisibility(true);
-      });
+      }
+    );
+    // .catch((error) => {
+    //   // console.log(
+    //   //   "🚀 ~ file: AskQuestion.jsx ~ line 32 ~ handleSubmit ~ error",
+    //   //   error
+    //   // );
+    //   setMessage(error.message);
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
   };
 
   const handleDeleteSolution = (id) => {
-    API.delete(`solutions/${id}`)
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: QuestionDetail.jsx ~ line 26 ~ deleteSolutionById ~ response",
-          response
-        );
-        setSolutions((prev) => prev.filter((solution) => solution.id !== id));
-        setMessage("Solution deleted successfull.");
-        setSeverity("success");
-        setSnackBarVisibility(true);
-      })
-      .catch((error) => {
-        setMessage(error.response.data.detail);
-        setSeverity("error");
-        setSnackBarVisibility(true);
-      });
+    API.delete(`solutions/${id}`).then((response) => {
+      console.log(
+        "🚀 ~ file: QuestionDetail.jsx ~ line 26 ~ deleteSolutionById ~ response",
+        response
+      );
+      setSolutions((prev) => prev.filter((solution) => solution.id !== id));
+      setMessage("Solution deleted successfully.");
+      setSeverity("success");
+      setSnackBarVisibility(true);
+    });
+    // .catch((error) => {
+    //   setMessage(error.response.data.detail);
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
   };
 
   return (

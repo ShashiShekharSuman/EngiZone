@@ -13,10 +13,11 @@ import {
   InputAdornment,
   styled,
 } from "@mui/material";
-import { common, red } from "@mui/material/colors";
+import { red } from "@mui/material/colors";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import API from "../axios";
 import AuthContext from "../contexts/AuthContext";
+import MessageContext from "../contexts/MessageContext";
 import moment from "moment";
 import SendIcon from "@mui/icons-material/Send";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -36,45 +37,48 @@ const Comment = ({ parent, comment, loading, handleDelete }) => {
   const [replyText, setReplyText] = React.useState("");
   const [showReplyTextField, setShowReplyTextField] = React.useState(false);
   const { user } = React.useContext(AuthContext);
+  const { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
 
   const handleSubmit = async () => {
     API.post("comments/", {
       solution: comment.solution,
       parent: comment.id,
       comment: replyText,
-    })
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: Comment.jsx ~ line 63 ~ addReply ~ response",
-          response
-        );
-        setReplies((prev) => prev.concat(response.data));
-        setReplyText("");
-        setShowReplyTextField(false);
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: Comment.jsx ~ line 66 ~ addReply ~ error",
-          error
-        );
-      });
+    }).then((response) => {
+      // console.log(
+      //   "🚀 ~ file: Comment.jsx ~ line 63 ~ addReply ~ response",
+      //   response
+      // );
+      setReplies((prev) => prev.concat(response.data));
+      setReplyText("");
+      setShowReplyTextField(false);
+    });
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: Comment.jsx ~ line 66 ~ addReply ~ error",
+    //     error
+    //   );
+    // });
   };
 
   const handleDeleteReply = (id) => {
-    API.delete(`comments/${id}`)
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: Comment.jsx ~ line 92 ~ deleteReplyById ~ response",
-          response
-        );
-        setReplies((prev) => prev.filter((reply) => reply.id !== id));
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: Comment.jsx ~ line 95 ~ deleteReplyById ~ error",
-          error
-        );
-      });
+    API.delete(`comments/${id}`).then((response) => {
+      console.log(
+        "🚀 ~ file: Comment.jsx ~ line 92 ~ deleteReplyById ~ response",
+        response
+      );
+      setReplies((prev) => prev.filter((reply) => reply.id !== id));
+      setMessage("Comment deleted successfully.");
+      setSeverity("success");
+      setSnackBarVisibility(true);
+    });
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: Comment.jsx ~ line 95 ~ deleteReplyById ~ error",
+    //     error
+    //   );
+    // });
   };
 
   return (

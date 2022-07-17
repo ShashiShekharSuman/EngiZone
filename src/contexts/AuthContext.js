@@ -7,9 +7,9 @@ const AuthContext = createContext();
 export default AuthContext;
 
 export const AuthProvider = ({ children }) => {
-  let [user, setUser] = useState(null);
-  let [loading, setLoading] = useState(false);
-  let { setMessage, setSnackBarVisibility, setSeverity } =
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const { setMessage, setSnackBarVisibility, setSeverity } =
     useContext(MessageContext);
 
   API.interceptors.response.use(
@@ -17,13 +17,16 @@ export const AuthProvider = ({ children }) => {
       return res;
     },
     async (err) => {
-      if (err.config.url !== "login/" && err.response) {
+      if (
+        err.config.url !== "login/" &&
+        err.config.url !== "refresh/" &&
+        err.response.status === 401 &&
+        !err.config._retry
+      ) {
         // Access Token Expired
-        console.log(err);
-        if (err.response.status === 401 && !err.config._retry) {
-          err.config._retry = true;
-          // try {
-          const refresh = localStorage.getItem("refresh");
+        err.config._retry = true;
+        const refresh = localStorage.getItem("refresh");
+        if (refresh) {
           await API.post("refresh/", { refresh })
             .then((res) => {
               localStorage.setItem("access", res.data.access);
@@ -31,21 +34,16 @@ export const AuthProvider = ({ children }) => {
             })
             .catch((_error) => {
               // Refreash Token Expired
-              signOut();
-              setMessage(
-                _error.response.status === 401
-                  ? "Sesson Expired"
-                  : _error.message
-              );
-              setSeverity(_error.response.status === 401 ? "info" : "error");
-              setSnackBarVisibility(true);
-              // return Promise.reject(_error);
+              if (_error.response.status === 401) {
+                signOut(true);
+              }
             });
-          return API(err.config);
-          // } catch (_error) {
-          //   return Promise.reject(_error);
-          // }
+        } else {
+          setMessage("You need to Log In");
+          setSeverity("info");
+          setSnackBarVisibility(true);
         }
+        return API(err.config);
       }
       return Promise.reject(err);
     }
@@ -54,53 +52,49 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (localStorage.getItem("access")) {
       setLoading(true);
-      API.get("users/auth")
-        .then((res) => {
-          console.log(res);
-          setUser(res.data);
-          setMessage(
-            "Welcome back " + res.data.first_name + " " + res.data.last_name
-          );
-          setSeverity("");
-          setSnackBarVisibility(true);
-          setLoading(false);
-        })
-        .catch((error) => {
-          setMessage(
-            error.message
-          );
-          setSeverity("error");
-          setSnackBarVisibility(true);
-        });
+      API.get("users/auth").then((res) => {
+        console.log(res);
+        setUser(res.data);
+        setMessage(
+          "Welcome back " + res.data.first_name + " " + res.data.last_name
+        );
+        setSeverity("");
+        setSnackBarVisibility(true);
+        setLoading(false);
+      });
+      // .catch((error) => {
+      //   setMessage(error.message);
+      //   setSeverity("error");
+      //   setSnackBarVisibility(true);
+      // });
     }
   }, []);
 
   const signIn = (data) => {
     setLoading(true);
-    API.post("login/", data)
-      .then((res) => {
-        localStorage.setItem("access", res.data.token.access);
-        localStorage.setItem("refresh", res.data.token.refresh);
-        setUser(res.data.user);
-        setMessage(`Hi ${res.data.user.first_name} ${res.data.user.last_name}`);
-        setSeverity("success");
-        setSnackBarVisibility(true);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setMessage(
-          error.response.data ? error.response.data.detail : error.message
-        );
-        setSeverity("error");
-        setSnackBarVisibility(true);
-      });
+    API.post("login/", data).then((res) => {
+      localStorage.setItem("access", res.data.token.access);
+      localStorage.setItem("refresh", res.data.token.refresh);
+      setUser(res.data.user);
+      setMessage(`Hi ${res.data.user.first_name} ${res.data.user.last_name}`);
+      setSeverity("success");
+      setSnackBarVisibility(true);
+      setLoading(false);
+    });
+    // .catch((error) => {
+    //   setMessage(
+    //     error.response.data ? error.response.data.detail : error.message
+    //   );
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
   };
 
   const signUp = (data, setError) => {
     setLoading(true);
     API.post("users/", data)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         // navigate("/");
         const email = data.email;
         const password = data.password;
@@ -111,20 +105,22 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       })
       .catch((error) => {
-        setMessage(error.message);
-        setSeverity("error");
-        setSnackBarVisibility(true);
+        // setMessage(error.message);
+        // setSeverity("error");
+        // setSnackBarVisibility(true);
         setError(error.response?.data);
       });
   };
 
-  let signOut = () => {
+  let signOut = (session_expired = false) => {
     setLoading(true);
     // setAuthToken(null);
     setUser(null);
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
-    setMessage("Your have been logged out.");
+    setMessage(
+      session_expired ? "Session_Expired" : "Your have been logged out."
+    );
     setSeverity("info");
     setSnackBarVisibility(true);
     setLoading(false);
@@ -136,10 +132,10 @@ export const AuthProvider = ({ children }) => {
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then((response) => {
-        console.log(
-          "🚀 ~ file: EditProfile.jsx ~ line 28 ~ updateUserDetails ~ re̥sponse",
-          response
-        );
+        // console.log(
+        //   "🚀 ~ file: EditProfile.jsx ~ line 28 ~ updateUserDetails ~ re̥sponse",
+        //   response
+        // );
         setUser(response.data);
         console.log(user);
         setMessage("Your changes have been saved.");
@@ -148,9 +144,9 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       })
       .catch((error) => {
-        setMessage(error.message);
-        setSeverity("error");
-        setSnackBarVisibility(true);
+        // setMessage(error.message);
+        // setSeverity("error");
+        // setSnackBarVisibility(true);
         setError(error.response.data);
       });
   };

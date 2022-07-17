@@ -1,10 +1,9 @@
 import axios from "axios";
 
-const BASE_URL = "http://127.0.0.1:8000/";
-// const BASE_URL = "https://engizone-api.herokuapp.com/";
+// const BASE_URL = "http://127.0.0.1:8000/";
 
 const API = axios.create({
-  baseURL: BASE_URL,
+  baseURL: process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000/",
   // timeout: 5000,
   headers: {
     "Content-Type": "application/json",

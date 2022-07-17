@@ -43,18 +43,15 @@ const SignIn = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     await signIn({ email, password });
-    console.log("=>(SignIn.jsx:41) { email, password }", { email, password });
-    console.log("=>(SignIn.jsx:42) user", user);
+    // console.log("=>(SignIn.jsx:41) { email, password }", { email, password });
+    // console.log("=>(SignIn.jsx:42) user", user);
   };
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
 
   return (
-    <Container
-      component="main"
-      maxWidth="sm"
-    >
+    <Container component="main" maxWidth="sm">
       <CssBaseline />
       <Box
         sx={{
