@@ -1,78 +1,154 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useContext } from "react";
 import API from "../axios";
-import { useNavigate } from "react-router-dom";
+import MessageContext from "./MessageContext";
 
 const AuthContext = createContext();
 
 export default AuthContext;
 
 export const AuthProvider = ({ children }) => {
-  let [user, setUser] = useState(null);
-  let [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const { setMessage, setSnackBarVisibility, setSeverity } =
+    useContext(MessageContext);
+
+  API.interceptors.response.use(
+    (res) => {
+      return res;
+    },
+    async (err) => {
+      if (
+        err.config.url !== "login/" &&
+        err.config.url !== "refresh/" &&
+        err.response.status === 401 &&
+        !err.config._retry
+      ) {
+        // Access Token Expired
+        err.config._retry = true;
+        const refresh = localStorage.getItem("refresh");
+        if (refresh) {
+          await API.post("refresh/", { refresh })
+            .then((res) => {
+              localStorage.setItem("access", res.data.access);
+              localStorage.setItem("refresh", res.data.refresh);
+            })
+            .catch((_error) => {
+              // Refreash Token Expired
+              if (_error.response.status === 401) {
+                signOut(true);
+              }
+            });
+        } else {
+          setMessage("You need to Log In");
+          setSeverity("info");
+          setSnackBarVisibility(true);
+        }
+        return API(err.config);
+      }
+      return Promise.reject(err);
+    }
+  );
 
   useEffect(() => {
-    setLoading(true);
     if (localStorage.getItem("access")) {
-      API.get("auth/")
-        .then((res) => {
-          console.log(res);
-          setUser(res.data);
-        })
-        .catch((error) => {
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            console.log(error.response.status);
-            console.log(error.response.data);
-            console.log(error.response.headers);
-          } else if (error.request) {
-            // The request was made but no response was received
-            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-            // http.ClientRequest in node.js
-            console.log(error.request);
-          } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log("Error", error.message);
-          }
-          console.log(error.config);
-        });
+      setLoading(true);
+      API.get("users/auth").then((res) => {
+        console.log(res);
+        setUser(res.data);
+        setMessage(
+          "Welcome back " + res.data.first_name + " " + res.data.last_name
+        );
+        setSeverity("");
+        setSnackBarVisibility(true);
+        setLoading(false);
+      });
+      // .catch((error) => {
+      //   setMessage(error.message);
+      //   setSeverity("error");
+      //   setSnackBarVisibility(true);
+      // });
     }
-    setLoading(false);
   }, []);
 
   const signIn = (data) => {
     setLoading(true);
-    API.post("login/", data)
-      .then((res) => {
-        localStorage.setItem("access", res.data.token.access);
-        localStorage.setItem("refresh", res.data.token.refresh);
-        setUser(res.data.user);
-        setLoading(false);
-      })
-      .catch((error) => console.log(error));
+    API.post("login/", data).then((res) => {
+      localStorage.setItem("access", res.data.token.access);
+      localStorage.setItem("refresh", res.data.token.refresh);
+      setUser(res.data.user);
+      setMessage(`Hi ${res.data.user.first_name} ${res.data.user.last_name}`);
+      setSeverity("success");
+      setSnackBarVisibility(true);
+      setLoading(false);
+    });
+    // .catch((error) => {
+    //   setMessage(
+    //     error.response.data ? error.response.data.detail : error.message
+    //   );
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
   };
 
-  const signUp = (data) => {
+  const signUp = (data, setError) => {
     setLoading(true);
     API.post("users/", data)
       .then((res) => {
-        console.log(res.data);
+        // console.log(res);
         // navigate("/");
         const email = data.email;
         const password = data.password;
         signIn({ email, password });
+        setMessage("Your account has been successfully created.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
         setLoading(false);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        // setMessage(error.message);
+        // setSeverity("error");
+        // setSnackBarVisibility(true);
+        setError(error.response?.data);
+      });
   };
 
-  let signOut = () => {
+  let signOut = (session_expired = false) => {
     setLoading(true);
     // setAuthToken(null);
     setUser(null);
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
+    setMessage(
+      session_expired ? "Session_Expired" : "Your have been logged out."
+    );
+    setSeverity("info");
+    setSnackBarVisibility(true);
     setLoading(false);
+  };
+
+  const editProfile = (formData, setError) => {
+    setLoading(true);
+    API.patch(`users/${user.id}/`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then((response) => {
+        // console.log(
+        //   "🚀 ~ file: EditProfile.jsx ~ line 28 ~ updateUserDetails ~ re̥sponse",
+        //   response
+        // );
+        setUser(response.data);
+        console.log(user);
+        setMessage("Your changes have been saved.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
+        setLoading(false);
+      })
+      .catch((error) => {
+        // setMessage(error.message);
+        // setSeverity("error");
+        // setSnackBarVisibility(true);
+        setError(error.response.data);
+      });
   };
 
   let contextData = {
@@ -81,22 +157,8 @@ export const AuthProvider = ({ children }) => {
     signIn: signIn,
     signOut: signOut,
     signUp: signUp,
+    editProfile: editProfile,
   };
-
-  // useEffect(() => {
-  //   if (loading) {
-  //     updateToken();
-  //   }
-
-  //   let fourMinutes = 1000 * 60 * 4;
-
-  //   let interval = setInterval(() => {
-  //     if (authTokens) {
-  //       updateToken();
-  //     }
-  //   }, fourMinutes);
-  //   return () => clearInterval(interval);
-  // }, [authTokens, loading]);
 
   return (
     <AuthContext.Provider value={contextData}>

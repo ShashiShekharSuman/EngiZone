@@ -10,11 +10,40 @@ import {
   CssBaseline,
   Avatar,
 } from "@mui/material";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+
 import SendIcon from "@mui/icons-material/Send";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
+import API from "../axios";
+import MessageContext from "../contexts/MessageContext";
 
 const Contact = () => {
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [message, setMessageText] = React.useState("");
+  let { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
+
+  const handleSubmit = () => {
+    API.post("contact/", { name: name, email: email, message: message }).then(
+      (response) => {
+        console.log(response);
+        setName("");
+        setEmail("");
+        setMessageText("");
+        setMessage("Thanks for contacting us :)");
+        setSeverity("success");
+        setSnackBarVisibility(true);
+      }
+    );
+    // .catch((error) => {
+    //   setMessage(
+    //     error.response.data ? error.response.data.detail : error.message
+    //   );
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
+  };
+
   return (
     <Container
       maxWidth={"sm"}
@@ -40,12 +69,7 @@ const Contact = () => {
             </Typography>
           </Grid>
         </Grid>
-        <Box
-          component="form"
-          onSubmit={(event) => {
-            event.preventDefault();
-          }}
-        >
+        <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -53,6 +77,10 @@ const Contact = () => {
                 name="name"
                 required
                 fullWidth
+                value={name}
+                onChange={(event) => {
+                  setName(event.target.value);
+                }}
                 id="name"
                 label="Full Name"
               />
@@ -64,6 +92,10 @@ const Contact = () => {
                 id="email"
                 label="Email Address"
                 name="email"
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                }}
                 autoComplete="email"
               />
             </Grid>
@@ -73,6 +105,10 @@ const Contact = () => {
                 fullWidth
                 id="outlined-multiline-static"
                 label="Your Message"
+                value={message}
+                onChange={(event) => {
+                  setMessageText(event.target.value);
+                }}
                 multiline
                 rows={8}
               />

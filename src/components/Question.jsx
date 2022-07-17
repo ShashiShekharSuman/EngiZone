@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Avatar,
   Typography,
@@ -20,7 +20,6 @@ import {
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { red } from "@mui/material/colors";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkAddedIcon from "@mui/icons-material/BookmarkAdded";
 import ShareIcon from "@mui/icons-material/Share";
@@ -30,40 +29,48 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import moment from "moment";
 import parse from "html-react-parser";
 import AuthContext from "../contexts/AuthContext";
+import MessageContext from "../contexts/MessageContext";
 import API from "../axios";
 
-const Question = ({
-  id,
-  owner,
-  title,
-  body,
-  tags,
-  loading,
-  created_at,
-  updated_at,
-}) => {
+const Question = ({ question, loading }) => {
   const { user } = React.useContext(AuthContext);
-  const [bookmark, setBookmark] = React.useState(true);
-  const [favorite, setFavorite] = React.useState(true);
+  const [bookmark, setBookmark] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (question && user) {
+      API.get(`bookmarks/${question.id}/`)
+        .then((response) => setBookmark(true))
+        .catch((error) => {
+          setBookmark(false);
+        });
+    }
+  }, [user]);
 
   const handleDeleteQuestion = () => {
     handleClose();
-    API.delete(`problems/${id}`)
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: Question.jsx ~ line 37 ~ deleteQuestionById ~ response",
-          response
-        );
-        navigate("/questions");
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: Question.jsx ~ line 40 ~ deleteQuestionById ~ error",
-          error
-        );
-      });
+    API.delete(`problems/${question.id}`).then((response) => {
+      console.log(
+        "🚀 ~ file: Question.jsx ~ line 37 ~ deleteQuestionById ~ response",
+        response
+      );
+      setMessage("Question deleted successfull.");
+      setSeverity("success");
+      setSnackBarVisibility(true);
+      navigate("/questions");
+    });
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: Question.jsx ~ line 40 ~ deleteQuestionById ~ error",
+    //     error
+    //   );
+    //   setMessage(error.message);
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
   };
 
   const handleClickOpen = () => {
@@ -74,10 +81,23 @@ const Question = ({
     setOpen(false);
   };
 
-  const handleBookmark = (bookmark) => {
-    console.log(bookmark);
-
-    setBookmark((prev) => !prev);
+  const handleBookmark = () => {
+    API.post("bookmarks/", { question: question?.id }).then((response) => {
+      console.log(
+        "🚀 ~ file: Solution.jsx ~ line 107 ~ voteSolution ~ response",
+        response
+      );
+      setBookmark(response.status == 201 ? true : false);
+      // API.get(`bookmarks/${question.id}/`)
+      //   .then((response) => setBookmark(response.data.bookmark))
+      //   .catch((error) => console.log(error));
+    });
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: Solution.jsx ~ line 110 ~ voteSolution ~ error",
+    //     error
+    //   );
+    // });
   };
 
   return (
@@ -96,8 +116,8 @@ const Question = ({
                 />
               ) : (
                 <Avatar
-                  src={owner.avatar}
-                  alt={owner.first_name.toUpperCase()}
+                  src={question.owner.avatar}
+                  alt={question.owner.first_name.toUpperCase()}
                   sx={{ bgcolor: red[500] }}
                   aria-label=""
                 />
@@ -106,15 +126,15 @@ const Question = ({
             action={
               loading ? null : (
                 <>
-                  {user?.id === owner.id && (
+                  {user?.id === question.owner.id && (
                     <IconButton
                       LinkComponent={Link}
-                      to={`/questions/${id}/edit`}
+                      to={`/questions/${question.id}/edit`}
                     >
                       <EditIcon />
                     </IconButton>
                   )}
-                  {user?.id === owner.id && (
+                  {user?.id === question.owner.id && (
                     <IconButton
                       aria-label="delete"
                       onClick={handleClickOpen}
@@ -123,11 +143,8 @@ const Question = ({
                       <DeleteForeverIcon />
                     </IconButton>
                   )}
-                  <IconButton
-                    aria-label="bookmark"
-                    onClick={() => setBookmark((prev) => !prev)}
-                  >
-                    {!bookmark ? (
+                  <IconButton aria-label="bookmark" onClick={handleBookmark}>
+                    {bookmark ? (
                       <BookmarkAddedIcon sx={{ color: "green" }} />
                     ) : (
                       <BookmarkIcon />
@@ -151,24 +168,23 @@ const Question = ({
                   sx={{ mb: 1 }}
                 />
               ) : (
-                `${owner.first_name} ${owner.last_name}`
+                `${question.owner.first_name} ${question.owner.last_name}`
               )
             }
             subheader={
               loading ? (
                 <Skeleton animation="wave" height={10} width="20%" />
               ) : (
-                `${moment(updated_at).fromNow()} ${
-                  created_at === updated_at ? "" : "edited"
-                }`
+                `${
+                  question.created_at === question.updated_at ? "" : "edited"
+                } ${moment(question.updated_at).fromNow()}`
               )
             }
-            // subheaderTypographyProps={{ variant: "caption" }}
           />
           <Divider />
           <CardContent sx={{ pt: 1, pb: 1 }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-              {loading ? <Skeleton animation="wave" /> : title}
+              {loading ? <Skeleton animation="wave" /> : question.title}
             </Typography>
             {loading ? (
               <Typography variant="body2" color="text.primary">
@@ -194,7 +210,7 @@ const Question = ({
               </Typography>
             ) : (
               <div className="ck-content" style={{ wordBreak: "break-all" }}>
-                {parse(body)}
+                {parse(question.body)}
               </div>
             )}
           </CardContent>
@@ -221,7 +237,7 @@ const Question = ({
                       ))}
                   </React.Fragment>
                 ) : (
-                  tags.map((tag) => (
+                  question.tags.map((tag) => (
                     <Chip
                       color="primary"
                       key={tag.id}

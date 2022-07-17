@@ -19,8 +19,9 @@ const RoundedTextField = styled(TextField)({
 });
 
 const SearchBar = ({ defaultSearchQuery, setDefaultSearchQuery }) => {
-  const setSearchParams = useSearchParams()[1];
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = React.useState("");
+  
   return (
     <Box
       component="form"
@@ -32,6 +33,7 @@ const SearchBar = ({ defaultSearchQuery, setDefaultSearchQuery }) => {
           });
         else setSearchParams();
         setDefaultSearchQuery(searchQuery);
+        // console.log(  );
       }}
       method="get"
     >
@@ -44,10 +46,7 @@ const SearchBar = ({ defaultSearchQuery, setDefaultSearchQuery }) => {
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton
-                type="submit"
-                aria-label="search"
-              >
+              <IconButton type="submit" aria-label="search">
                 <SearchIcon />
               </IconButton>
             </InputAdornment>

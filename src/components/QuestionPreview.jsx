@@ -23,19 +23,7 @@ import { Link } from "react-router-dom";
 import moment from "moment";
 import parse from "html-react-parser";
 
-const QuestionPreview = ({
-  id,
-  owner,
-  title,
-  body,
-  tags,
-  loading,
-  created_at,
-  updated_at,
-}) => {
-  const [bookmark, setBookmark] = React.useState(true);
-  const [favorite, setFavorite] = React.useState(true);
-
+const QuestionPreview = ({ question, loading }) => {
   return (
     <Grid item>
       <Card variant="outlined">
@@ -51,8 +39,8 @@ const QuestionPreview = ({
               />
             ) : (
               <Avatar
-                src={owner.avatar}
-                alt={owner.first_name.toUpperCase()}
+                src={question.owner.avatar}
+                alt={question.owner.first_name.toUpperCase()}
                 sx={{ bgcolor: red[500] }}
                 aria-label=""
               />
@@ -61,22 +49,6 @@ const QuestionPreview = ({
           action={
             loading ? null : (
               <>
-                <IconButton
-                  aria-label="add to favorites"
-                  onClick={() => setFavorite((prev) => !prev)}
-                >
-                  <FavoriteIcon sx={!favorite ? { color: red[500] } : {}} />
-                </IconButton>
-                <IconButton
-                  aria-label="bookmark"
-                  onClick={() => setBookmark((prev) => !prev)}
-                >
-                  {!bookmark ? (
-                    <BookmarkAddedIcon sx={{ color: "green" }} />
-                  ) : (
-                    <BookmarkIcon />
-                  )}
-                </IconButton>
                 <IconButton aria-label="share">
                   <ShareIcon />
                 </IconButton>
@@ -95,16 +67,16 @@ const QuestionPreview = ({
                 sx={{ mb: 1 }}
               />
             ) : (
-              `${owner.first_name} ${owner.last_name}`
+              `${question.owner.first_name} ${question.owner.last_name}`
             )
           }
           subheader={
             loading ? (
               <Skeleton animation="wave" height={10} width="20%" />
             ) : (
-              `${moment(updated_at).fromNow()} ${
-                created_at === updated_at ? "" : "edited"
-              }`
+              `${
+                question.created_at === question.updated_at ? "" : "edited"
+              } ${moment(question.updated_at).fromNow()}`
             )
           }
         />
@@ -112,15 +84,15 @@ const QuestionPreview = ({
 
         <CardActionArea
           component={Link}
-          to={`/questions/${id}`}
+          to={`/questions/${question?.id}`}
           disabled={loading}
         >
           <CardContent sx={{ pt: 1, pb: 1 }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-              {loading ? <Skeleton animation="wave" /> : title}
+              {loading ? <Skeleton animation="wave" /> : question.title}
             </Typography>
-            <Typography variant="body2" color="text.primary">
-              {loading ? (
+            {loading ? (
+              <Typography variant="body2" color="text.primary">
                 <React.Fragment>
                   {Array(3)
                     .fill()
@@ -134,12 +106,12 @@ const QuestionPreview = ({
                       />
                     ))}
                 </React.Fragment>
-              ) : (
-                <div className="ck-content" style={{ wordBreak: "break-all" }}>
-                  {parse(body)}
-                </div>
-              )}
-            </Typography>
+              </Typography>
+            ) : (
+              <div className="ck-content" style={{ wordBreak: "break-all" }}>
+                {parse(question.body)}
+              </div>
+            )}
           </CardContent>
         </CardActionArea>
         <CardActions sx={{ p: 2, pt: 1 }}>
@@ -165,7 +137,7 @@ const QuestionPreview = ({
                     ))}
                 </React.Fragment>
               ) : (
-                tags.map((tag) => (
+                question.tags.map((tag) => (
                   <Chip
                     color="primary"
                     key={tag.id}

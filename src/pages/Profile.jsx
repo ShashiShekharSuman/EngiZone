@@ -25,6 +25,7 @@ import LinkIcon from "@mui/icons-material/Link";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import API from "../axios";
 import AuthContext from "../contexts/AuthContext";
+import MessageContext from "../contexts/MessageContext";
 
 const StatsCard = () => {
   return (
@@ -67,6 +68,8 @@ const Profile = () => {
   const { user } = React.useContext(AuthContext);
   // const [userDetails, setUserDetails] = React.useState(null);
   const [questions, setQuestions] = React.useState([]);
+  const { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
 
   React.useEffect(() => {
     if (user) {
@@ -84,20 +87,18 @@ const Profile = () => {
       //       error
       //     );
       //   });
-      API.get(`problems/?owner=${user?.id}`)
-        .then((response) => {
-          console.log(
-            "🚀 ~ file: Profile.jsx ~ line 71 ~ getQuestionsByAuthorId ~ response",
-            response
-          );
-          setQuestions(response.data.questions);
-        })
-        .catch((error) => {
-          console.log(
-            "🚀 ~ file: Profile.jsx ~ line 74 ~ getQuestionsByAuthorId ~ error",
-            error
-          );
-        });
+      API.get(`problems/?owner=${user?.id}`).then((response) => {
+        // console.log(
+        //   "🚀 ~ file: Profile.jsx ~ line 71 ~ getQuestionsByAuthorId ~ response",
+        //   response
+        // );
+        setQuestions(response.data.questions);
+      });
+      // .catch((error) => {
+      //   setMessage(error.message);
+      //   setSeverity("error");
+      //   setSnackBarVisibility(true);
+      // });
     }
   }, [user, user?._id]);
 
@@ -114,7 +115,7 @@ const Profile = () => {
           avatar={
             user ? (
               <Avatar
-                src={`https://engizone-api.herokuapp.com${user.avatar}`}
+                src={user.avatar}
                 alt={user.first_name.toUpperCase()}
                 sx={{ bgcolor: "crimson" }}
                 aria-label=""

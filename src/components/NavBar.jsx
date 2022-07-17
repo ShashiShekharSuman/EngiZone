@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   AppBar,
   Box,
@@ -11,7 +11,7 @@ import {
   Tooltip,
   MenuItem,
   Link,
-  Fab,
+  LinearProgress,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -19,10 +19,16 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import LoginIcon from "@mui/icons-material/Login";
 import AuthContext from "../contexts/AuthContext";
 
-const NavBar = () => {
-  const { user, signOut } = React.useContext(AuthContext);
-  console.log("=>(NavBar.jsx:24) user", user);
+const LinearIndeterminate = () => {
+  return (
+    <Box sx={{ width: "100%" }}>
+      <LinearProgress color="secondary" />
+    </Box>
+  );
+};
 
+const NavBar = () => {
+  const { user, signOut, loading } = React.useContext(AuthContext);
   const pages = ["Home", "Questions", "Resources", "Contact Us"];
   const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
@@ -145,7 +151,7 @@ const NavBar = () => {
             <Tooltip title="User">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar
-                  src={`https://engizone-api.herokuapp.com${user.avatar}`}
+                  src={user.avatar}
                   alt={user.first_name.toUpperCase()}
                   sx={{ bgcolor: "crimson" }}
                   aria-label=""
@@ -193,6 +199,7 @@ const NavBar = () => {
           </Box>
         )}
       </Toolbar>
+      {loading && <LinearIndeterminate />}
     </AppBar>
   );
 };

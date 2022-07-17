@@ -7,12 +7,14 @@ import {
   Avatar,
   Autocomplete,
   Chip,
+  Card,
 } from "@mui/material";
 import React from "react";
 import TextEditor from "../components/TextEditor";
 import HelpIcon from "@mui/icons-material/Help";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../axios";
+import MessageContext from "../contexts/MessageContext";
 
 const EditQuestion = () => {
   const { id } = useParams();
@@ -22,31 +24,31 @@ const EditQuestion = () => {
   const [tags, setTags] = React.useState([]);
   const [options, setOptions] = React.useState([]);
   const [changes, setChanges] = React.useState({});
+  let { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    API.get(`problems/${id}`)
-      .then((response) => {
-        setTitle(response.data.title);
-        setBody(response.data.body);
-        setTags(response.data.tags);
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: EditQuestion.jsx ~ line 31 ~ getQuestionById ~ error",
-          error
-        );
-      });
-    API.get("tags/")
-      .then((response) => {
-        setOptions(response.data);
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: AskQuestion.jsx ~ line 52 ~ setOptions ~ error",
-          error
-        );
-      });
+    API.get(`problems/${id}`).then((response) => {
+      setTitle(response.data.title);
+      setBody(response.data.body);
+      setTags(response.data.tags);
+    });
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: EditQuestion.jsx ~ line 31 ~ getQuestionById ~ error",
+    //     error
+    //   );
+    // });
+    API.get("tags/").then((response) => {
+      setOptions(response.data);
+    });
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: AskQuestion.jsx ~ line 52 ~ setOptions ~ error",
+    //     error
+    //   );
+    // });
   }, []);
 
   const handleBodyChange = (event, editor) => {
@@ -57,21 +59,27 @@ const EditQuestion = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    API.patch(`problems/${id}/`, { title: title, body: body, tags: tags })
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: EditQuestion.jsx ~ line 53 ~ .then ~ response",
-          response
-        );
-
+    API.patch(`problems/${id}/`, { title: title, body: body, tags: tags }).then(
+      (response) => {
+        // console.log(
+        //   "🚀 ~ file: EditQuestion.jsx ~ line 53 ~ .then ~ response",
+        //   response
+        // );
+        setMessage("Question updated successfully.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
         navigate(`/questions/${response.data.id}`);
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: EditQuestion.jsx ~ line 58 ~ handleSubmit ~ error",
-          error
-        );
-      });
+      }
+    );
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: EditQuestion.jsx ~ line 58 ~ handleSubmit ~ error",
+    //     error
+    //   );
+    //   setMessage(error.message);
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
   };
 
   return (
@@ -125,9 +133,11 @@ const EditQuestion = () => {
           <Autocomplete
             multiple
             options={options}
-            value={tags}
+            value={options.length ? tags : ""}
             getOptionLabel={(option) => option.tag_name}
-            limitTags={2}
+            limitTags={5}
+            filterSelectedOptions
+            loading
             onChange={(event, value) => {
               setTags(value);
               setChanges((prev) => ({ ...prev, tags: tags }));
@@ -153,17 +163,38 @@ const EditQuestion = () => {
                 placeholder="Add Tags"
               />
             )}
-            // renderOption={(props, option, { selected }) => (
-            //   <li {...props}>
-            //     <Checkbox
-            //       icon={icon}
-            //       checkedIcon={checkedIcon}
-            //       style={{ marginRight: 8 }}
-            //       checked={selected}
-            //     />
-            //     {option.title}
-            //   </li>
-            // )}
+            ListboxComponent={Grid}
+            ListboxProps={{
+              container: true,
+              spacing: 1,
+              justifyContent: "center",
+              sx: { pr: 1, overflow: "auto" },
+            }}
+            renderOption={(props, option) => (
+              <Grid item xs={10} sm={4} key={props.index}>
+                <Card
+                  {...props}
+                  sx={{ width: "100%", height: "100%" }}
+                  variant="outlined"
+                >
+                  <Grid container justifyContent="space-between">
+                    <Grid item>
+                      <Typography variant="h6" color="primary">
+                        {option.tag_name}
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="body2">{option.tag_type}</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body2" align="justify" gutterBottom>
+                        {option.tag_description}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Card>
+              </Grid>
+            )}
           />
         </Grid>
         <Grid item>

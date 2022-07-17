@@ -12,11 +12,7 @@ import {
 } from "@mui/material";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import {
-  DatePicker,
-  DesktopDatePicker,
-  MobileDatePicker,
-} from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers";
 import React from "react";
 import moment from "moment";
 import EditIcon from "@mui/icons-material/Edit";
@@ -29,7 +25,7 @@ const Input = styled("input")({
 });
 
 const EditProfile = () => {
-  const { user, setUser } = React.useContext(AuthContext);
+  const { user, editProfile } = React.useContext(AuthContext);
 
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
@@ -39,7 +35,8 @@ const EditProfile = () => {
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [avatar, setAvatar] = React.useState(null);
   const [avatarPreview, setAvatarPreview] = React.useState(null);
-  const [fetching, setFetching] = React.useState(true);
+  const [error, setError] = React.useState({});
+  // const [fetching, setFetching] = React.useState(true);
 
   const navigate = useNavigate();
 
@@ -58,19 +55,18 @@ const EditProfile = () => {
   const handleAvatarChange = (event) => {
     setAvatar(event.target.files[0]);
     setAvatarPreview(URL.createObjectURL(event.target.files[0]));
-    console.log(
-      "🚀 ~ file: EditProfile.jsx ~ line 120 ~ EditProfile ~ previewFile",
-      avatarPreview
-    );
-    console.log(
-      "🚀 ~ file: EditProfile.jsx ~ line 120 ~ EditProfile ~ avatarFile",
-      avatar
-    );
+    // console.log(
+    //   "🚀 ~ file: EditProfile.jsx ~ line 120 ~ EditProfile ~ previewFile",
+    //   avatarPreview
+    // );
+    // console.log(
+    //   "🚀 ~ file: EditProfile.jsx ~ line 120 ~ EditProfile ~ avatarFile",
+    //   avatar
+    // );
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setFetching(true);
     let formData = new FormData();
     formData.append("first_name", firstName);
     formData.append("last_name", lastName);
@@ -78,24 +74,8 @@ const EditProfile = () => {
     formData.append("gender", gender);
     formData.append("phone_no", `${phoneNumber}`);
     if (avatarPreview) formData.append("avatar", avatar);
-    API.patch(`users/${user.id}/`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: EditProfile.jsx ~ line 28 ~ updateUserDetails ~ re̥sponse",
-          response
-        );
-        navigate("/profile");
-        setUser(response.data);
-        console.log(user);
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: EditProfile.jsx ~ line 31 ~ updateUserDetails ~ error",
-          error
-        );
-      });
+    editProfile(formData, setError);
+    navigate("../profile/");
   };
 
   return (
@@ -131,16 +111,14 @@ const EditProfile = () => {
                 }}
               >
                 <Input
+                  // error={error.avatar}
                   accept="image/*"
                   id="icon-button-file"
                   onChange={handleAvatarChange}
                   type="file"
                 />
                 {!avatarPreview ? (
-                  <Avatar
-                    src={`https://engizone-api.herokuapp.com${user.avatar}`}
-                    sx={{ width: 200, height: 200 }}
-                  />
+                  <Avatar src={user?.avatar} sx={{ width: 200, height: 200 }} />
                 ) : (
                   <Avatar
                     src={avatarPreview}
@@ -151,6 +129,7 @@ const EditProfile = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
+                error={error.first_name}
                 autoComplete="given-name"
                 name="firstName"
                 required
@@ -160,10 +139,12 @@ const EditProfile = () => {
                 value={firstName}
                 onChange={(event) => setFirstName(event.target.value)}
                 autoFocus
+                helperText={error.first_name}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
+                error={error.last_name}
                 required
                 fullWidth
                 id="lastName"
@@ -172,6 +153,7 @@ const EditProfile = () => {
                 value={lastName}
                 onChange={(event) => setLastName(event.target.value)}
                 autoComplete="family-name"
+                helperText={error.last_name}
               />
             </Grid>
             <Grid item xs={12}>
@@ -186,10 +168,12 @@ const EditProfile = () => {
                 inputProps={{ readOnly: true }}
                 InputLabelProps={{ shrink: true }}
                 autoComplete="email"
+                helperText={error.email}
               />
             </Grid>
             <Grid item xs={12} container justifyContent="space-between">
               <TextField
+                error={error.gender}
                 value={gender}
                 required
                 sx={{ width: "49%" }}
@@ -197,13 +181,16 @@ const EditProfile = () => {
                 id="gender"
                 onChange={(event) => setGender(event.target.value)}
                 label="Gender"
+                helperText={error.gender}
               >
+                <MenuItem value={null} />
                 <MenuItem value={"M"}>Male</MenuItem>
                 <MenuItem value={"F"}>Female</MenuItem>
                 <MenuItem value={"O"}>Other</MenuItem>
               </TextField>
               <LocalizationProvider dateAdapter={AdapterMoment}>
                 <DatePicker
+                  // error={error.date_of_birth}
                   label="Date of Birth"
                   inputFormat="DD/MM/YYYY"
                   value={dateOfBirth}
@@ -212,13 +199,20 @@ const EditProfile = () => {
                     setDateOfBirth(date);
                   }}
                   renderInput={(params) => (
-                    <TextField {...params} required sx={{ width: "49%" }} />
+                    <TextField
+                      {...params}
+                      error={error.date_of_birth}
+                      helperText={error.date_of_birth}
+                      required
+                      sx={{ width: "49%" }}
+                    />
                   )}
                 />
               </LocalizationProvider>
             </Grid>
             <Grid item xs={12}>
               <TextField
+                error={error.phone_no}
                 required
                 fullWidth
                 value={phoneNumber}
@@ -226,6 +220,7 @@ const EditProfile = () => {
                 name="mobile-number"
                 label="Mobile Number"
                 id="mobile-number"
+                helperText={error.phone_no}
               />
             </Grid>
           </Grid>

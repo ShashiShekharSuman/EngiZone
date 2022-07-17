@@ -7,9 +7,10 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import { QuestionPreview, SearchBar } from "../components";
+import { QuestionPreview, SearchBar, FilterSection } from "../components";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../axios";
+import MessageContext from "../contexts/MessageContext";
 
 const Questions = () => {
   const url = new URL(window.location);
@@ -22,23 +23,25 @@ const Questions = () => {
   const [page, setPage] = useState(() =>
     url.searchParams.get("page") ? parseInt(url.searchParams.get("page")) : 1
   );
+  const { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
+
   useEffect(() => {
     setLoading(true);
-    API.get(`problems/${url.search}`)
-      .then((res) => {
-        setQuestions(res.data.questions);
-        setCount(res.data.total_pages);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        // setLoading(false);
-      });
+    API.get(`problems/${url.search}`).then((res) => {
+      setQuestions(res.data.questions);
+      setCount(res.data.total_pages);
+      setLoading(false);
+    });
+    // .catch((error) => {
+    //   setMessage(error.message);
+    //   setSeverity("error");
+    //   setSnackBarVisibility(true);
+    // });
   }, [page, searchQuery]);
 
-  console.log(questions);
-
   const navigate = useNavigate();
+
   return (
     <Container maxWidth="md">
       <Grid
@@ -57,7 +60,9 @@ const Questions = () => {
             setDefaultSearchQuery={setSearchQuery}
           />
         </Grid>
-
+        <Grid item>
+          <FilterSection />
+        </Grid>
         {loading ? (
           <React.Fragment>
             <QuestionPreview loading />
@@ -96,13 +101,7 @@ const Questions = () => {
             {questions.map((question) => (
               <QuestionPreview
                 key={question.id}
-                id={question.id}
-                owner={question.owner}
-                title={question.title}
-                body={question.body}
-                tags={question.tags}
-                created_at={question.created_at}
-                updated_at={question.updated_at}
+                question={question}
                 // loading
               />
             ))}

@@ -26,6 +26,7 @@ import {
 } from "@mui/material";
 
 import AuthContext from "../contexts/AuthContext";
+import MessageContext from "../contexts/MessageContext";
 import { Comment } from "../components";
 import SendIcon from "@mui/icons-material/Send";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -82,18 +83,19 @@ const Solution = ({ sol, handleDelete, loading }) => {
   const [solutionText, setSolutionText] = React.useState(
     solution ? solution : null
   );
+  const { setMessage, setSnackBarVisibility, setSeverity } =
+    React.useContext(MessageContext);
 
   React.useEffect(() => {
-    if (solution) {
-      API.get(`votes/${solution.id}/`)
-        .then((response) => {
-          setVote(response.data.vote);
-        })
-        .catch((error) => {
-          // console.log(error)
-        });
+    if (solution && user) {
+      API.get(`votes/${solution.id}/`).then((response) => {
+        setVote(response.data.vote);
+      });
+      // .catch((error) => {
+      //   // console.log(error)
+      // });
     }
-  }, []);
+  }, [user]);
 
   const [openEditSolutionDialog, setOpenEditSolutionDialog] =
     React.useState(false);
@@ -107,26 +109,30 @@ const Solution = ({ sol, handleDelete, loading }) => {
   };
 
   const handleUpdateSolution = () => {
-    API.patch(`solutions/${solution?.id}/`, { solution: solutionText })
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: Solution.jsx ~ line 161 ~ updateSolutionById ~ response",
-          response
-        );
+    API.patch(`solutions/${solution?.id}/`, { solution: solutionText }).then(
+      (response) => {
+        // console.log(
+        //   "🚀 ~ file: Solution.jsx ~ line 161 ~ updateSolutionById ~ response",
+        //   response
+        // );
         setSolution(response.data);
         handleCloseEditSolutionDialog();
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: Solution.jsx ~ line 164 ~ updateSolutionById ~ error",
-          error
-        );
-      });
+        setMessage("Solution updated successfully");
+        setSeverity("success");
+        setSnackBarVisibility(true);
+      }
+    );
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: Solution.jsx ~ line 164 ~ updateSolutionById ~ error",
+    //     error
+    //   );
+    // });
   };
 
   const handleVote = (vote) => {
-    API.post("votes/", { solution: solution.id, vote: vote })
-      .then((response) => {
+    API.post("votes/", { solution: solution.id, vote: vote }).then(
+      (response) => {
         console.log(
           "🚀 ~ file: Solution.jsx ~ line 107 ~ voteSolution ~ response",
           response
@@ -135,13 +141,17 @@ const Solution = ({ sol, handleDelete, loading }) => {
         API.get(`solutions/${solution.id}`)
           .then((response) => setSolution(response.data))
           .catch((error) => console.log(error));
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: Solution.jsx ~ line 110 ~ voteSolution ~ error",
-          error
-        );
-      });
+        setMessage("Thanks for your vote.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
+      }
+    );
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: Solution.jsx ~ line 110 ~ voteSolution ~ error",
+    //     error
+    //   );
+    // });
   };
 
   const handleViewComments = () => {
@@ -149,60 +159,65 @@ const Solution = ({ sol, handleDelete, loading }) => {
     setViewComments((prev) => !prev);
     setFetching(true);
     if (!viewComments) {
-      API.get(`comments/?solution=${solution.id}`)
-        .then((res) => {
-          setComments(res.data);
-          console.log(comments);
-          setFetching(false);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      API.get(`comments/?solution=${solution.id}`).then((res) => {
+        setComments(res.data);
+        console.log(comments);
+      });
+      // .catch((error) => {
+      //   console.log(error);
+      // });
     }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    API.post("comments/", { solution: solution.id, comment: commentText })
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: Solution.jsx ~ line 89 ~ addComment ~ response",
-          response
-        );
+    API.post("comments/", { solution: solution.id, comment: commentText }).then(
+      (response) => {
+        // console.log(
+        //   "🚀 ~ file: Solution.jsx ~ line 89 ~ addComment ~ response",
+        //   response
+        // );
         setComments((prev) => [response.data].concat(prev));
         setCommentText("");
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: Solution.jsx ~ line 97 ~ handleSubmit ~ error",
-          error
-        );
-      });
+        setMessage("Thanks for your comment.");
+        setSeverity("success");
+        setSnackBarVisibility(true);
+        setFetching(false);
+      }
+    );
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: Solution.jsx ~ line 97 ~ handleSubmit ~ error",
+    //     error
+    //   );
+    // });
   };
 
   const handleDeleteComment = (id) => {
-    console.log(
-      "🚀 ~ file: Solution.jsx ~ line 188 ~ Solution ~ id",
-      solution.id
-    );
-    console.log(
-      "🚀 ~ file: Solution.jsx ~ line 204 ~ handleDeleteComment ~ solution._id",
-      solution.id
-    );
-    API.delete(`comments/${id}`)
-      .then((response) => {
-        console.log(
-          "🚀 ~ file: Solution.jsx ~ line 191 ~ deleteCommentById ~ response",
-          response
-        );
-        setComments((prev) => prev.filter((comment) => comment.id !== id));
-      })
-      .catch((error) => {
-        console.log(
-          "🚀 ~ file: Solution.jsx ~ line 194 ~ deleteCommentById ~ error",
-          error
-        );
-      });
+    // console.log(
+    //   "🚀 ~ file: Solution.jsx ~ line 188 ~ Solution ~ id",
+    //   solution.id
+    // );
+    // console.log(
+    //   "🚀 ~ file: Solution.jsx ~ line 204 ~ handleDeleteComment ~ solution._id",
+    //   solution.id
+    // );
+    API.delete(`comments/${id}`).then((response) => {
+      // console.log(
+      //   "🚀 ~ file: Solution.jsx ~ line 191 ~ deleteCommentById ~ response",
+      //   response
+      // );
+      setComments((prev) => prev.filter((comment) => comment.id !== id));
+      setMessage("Comment deleted successfully.");
+      setSeverity("success");
+      setSnackBarVisibility(true);
+    });
+    // .catch((error) => {
+    //   console.log(
+    //     "🚀 ~ file: Solution.jsx ~ line 194 ~ deleteCommentById ~ error",
+    //     error
+    //   );
+    // });
   };
 
   const theme = useTheme();
